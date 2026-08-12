@@ -4,17 +4,20 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 60
     scripts:
-      - name: Setup project & Init Capacitor
+      - name: Setup & Build iOS
         script: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/ios
           npx cap init "TransferCarki" "com.transfercarki.app" --web-dir "."
           npx cap add ios
-      - name: Sync Capacitor
-        script: npx cap sync ios
-      - name: Build iOS App
+          npx cap sync ios
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO BUILD_DIR=../../build
+      - name: Package IPA
         script: |
-          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -derivedDataPath build archive -archivePath build/App.xcarchive
-          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportOptionsPlist ios/App/App/Info.plist -exportPath build/ios/ipa
+          mkdir -p build/ios/ipa/Payload
+          cp -r build/Release-iphoneos/App.app build/ios/ipa/Payload/
+          cd build/ios/ipa
+          zip -r App.ipa Payload
     artifacts:
-      - build/ios/ipa/*.ipa
+      - build/ios/ipa/App.ipa
