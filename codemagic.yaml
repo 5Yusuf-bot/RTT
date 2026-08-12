@@ -4,11 +4,16 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 60
     scripts:
-      - name: Install dependencies
+      - name: Install dependencies & iOS platform
         script: |
           npm install
-          npm install @capacitor/core @capacitor/cli
+          npm install @capacitor/core @capacitor/cli @capacitor/ios
+          npx cap add ios
       - name: Sync Capacitor
-        script: npx @capacitor/cli sync ios
+        script: npx cap sync ios
+      - name: Build iOS App
+        script: |
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -derivedDataPath build archive -archivePath build/App.xcarchive
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportOptionsPlist ios/App/App/Info.plist -exportPath build/ios/ipa
     artifacts:
       - build/ios/ipa/*.ipa
