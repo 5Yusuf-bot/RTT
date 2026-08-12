@@ -8,11 +8,15 @@ workflows:
         script: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/ios
-          npx cap init "TransferCarki" "com.transfercarki.app" --web-dir "."
+          mkdir -p public
+          cp index.html public/ 2>/dev/null || true
+          cp -r site/* public/ 2>/dev/null || true
+          npx cap init "TransferCarki" "com.transfercarki.app" --web-dir "public"
           npx cap add ios
           npx cap sync ios
           cd ios/App
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO BUILD_DIR=../../build
+          pod install || true
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO BUILD_DIR=../../build
       - name: Package IPA
         script: |
           mkdir -p build/ios/ipa/Payload
