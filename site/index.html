@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uygulamayı İndir</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .app-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            object-fit: cover;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(34, 197, 94, 0.4);
+        }
+        .info-box {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+        .info-item span {
+            display: block;
+            color: #64748b;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- Logo resminin adını icon.png olarak bu klasöre at -->
+        <img src="icon.png" alt="App Logo" class="app-icon">
+        
+        <h1>Uygulama Adı</h1>
+        <p class="subtitle">Android için resmi indirme sayfası</p>
+
+        <!-- APK dosyanın adını app-debug.apk yapıp buraya koy -->
+        <a href="app-debug.apk" class="download-btn" download>
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 16l4-5h-3V4h-2v7H8l4 5zm9 2H3v2h18v-2z"/>
+            </svg>
+            APK İndir
+        </a>
+
+        <div class="info-box">
+            <div class="info-item">
+                <span>PLATFORM</span>
+                Android
+            </div>
+            <div class="info-item">
+                <span>BOYUT</span>
+                ~15-30 MB
+            </div>
+            <div class="info-item">
+                <span>DURUM</span>
+                Güvenli
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
