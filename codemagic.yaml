@@ -9,8 +9,10 @@ workflows:
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/ios
           mkdir -p public
-          cp index.html public/ 2>/dev/null || true
-          cp -r site/* public/ 2>/dev/null || true
+          
+          # Oyun kodlarını public içine kopyala
+          cp -r * public/ 2>/dev/null || true
+          
           npx cap init "TransferCarki" "com.transfercarki.app" --web-dir "public"
           npx cap add ios
           npx cap sync ios
