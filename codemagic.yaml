@@ -5,8 +5,10 @@ workflows:
     max_build_duration: 60
     scripts:
       - name: Install dependencies
-        script: npm install
+        script: |
+          npm install
+          npm install @capacitor/core @capacitor/cli
       - name: Sync Capacitor
-        script: npx cap sync ios
+        script: npx @capacitor/cli sync ios
     artifacts:
       - build/ios/ipa/*.ipa
