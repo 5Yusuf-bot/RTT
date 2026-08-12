@@ -8,16 +8,22 @@ workflows:
         script: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/ios
-          mkdir -p public
           
-          # Oyun kodlarını public içine kopyala
-          cp -r * public/ 2>/dev/null || true
+          # public klasörünü oluştur ve ana dizindeki tüm web dosyalarını kopyala
+          mkdir -p public
+          cp index.html public/ 2>/dev/null || true
+          cp -r *.html *.js *.css *.png *.json public/ 2>/dev/null || true
+          cp -r site/* public/ 2>/dev/null || true
           
           npx cap init "TransferCarki" "com.transfercarki.app" --web-dir "public"
           npx cap add ios
           npx cap sync ios
+          
           cd ios/App
           pod install || true
+          
+          # SPM / GitHub indirme hatalarına karşı xcodebuild komutuna retry ekliyoruz
+          xcodebuild -resolvePackageDependencies -clonedSourcePackagesDirPath ./SourcePackages || true
           xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO BUILD_DIR=../../build
       - name: Package IPA
         script: |
