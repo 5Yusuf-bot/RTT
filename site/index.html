@@ -2,1111 +2,1229 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transfer Çarkı</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Glowo</title>
 <style>
   :root{
-    --bg-deep:#06231a;
-    --bg-mid:#0d3a2a;
-    --line-white: rgba(255,255,255,.09);
-    --panel:#0f3427;
-    --panel-edge: rgba(255, 217, 102, .18);
-    --gold:#ffcc33;
-    --gold-bright:#ffe98a;
-    --gold-deep:#b8860b;
-    --text:#f3f6f2;
-    --text-dim:#a9c2b4;
-    --red:#ff4d4f;
-    --green-ok:#3ddc84;
+    --bg:#0a0a0d;
+    --panel:#161619;
+    --panel-2:#1f1f24;
+    --border:#2a2a30;
+    --text:#f5f5f7;
+    --text-dim:#a2a2ab;
+    --text-faint:#6b6b74;
+    --accent1:#8b5cf6;
+    --accent2:#ec4899;
+    --accent3:#22d3ee;
+    --heart:#fe2c55;
+    --grad: linear-gradient(135deg, var(--accent1), var(--accent2) 55%, var(--accent3));
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  svg{ width:1em; height:1em; display:inline-block; vertical-align:middle; flex-shrink:0; }
   html,body{height:100%;}
   body{
-    margin:0;
-    min-height:100vh;
-    background:
-      radial-gradient(circle at 50% -10%, #12503a 0%, transparent 60%),
-      repeating-linear-gradient(90deg, var(--bg-mid) 0px, var(--bg-mid) 80px, var(--bg-deep) 80px, var(--bg-deep) 160px),
-      var(--bg-deep);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:#000;
     color:var(--text);
-    font-family:'Inter', sans-serif;
-    overflow-x:hidden;
-    position:relative;
-  }
-  body::before{
-    content:"";
-    position:fixed; inset:0;
-    background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,.55) 100%);
-    pointer-events:none;
-    z-index:0;
-  }
-  .display{ font-family:'Bebas Neue', sans-serif; letter-spacing:.04em; }
-
-  #app{
-    position:relative;
-    z-index:1;
-    max-width:480px;
-    margin:0 auto;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    padding-bottom:92px;
-  }
-
-  /* ---------- HEADER ---------- */
-  header{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    padding:16px 18px 10px;
-  }
-  .title-block h1{
-    font-family:'Bebas Neue', sans-serif;
-    font-size:30px;
-    letter-spacing:.06em;
-    margin:0;
-    line-height:1;
-    background: linear-gradient(180deg, var(--gold-bright), var(--gold) 60%, var(--gold-deep));
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    text-shadow: 0 2px 12px rgba(255,204,51,.25);
-  }
-  .title-block span{
-    font-size:11px;
-    color:var(--text-dim);
-    text-transform:uppercase;
-    letter-spacing:.14em;
-  }
-  .stats{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    gap:4px;
-  }
-  .score-pill{
-    background:linear-gradient(135deg, #14503a, #0c2e21);
-    border:1px solid var(--panel-edge);
-    border-radius:999px;
-    padding:6px 14px;
-    font-family:'Bebas Neue',sans-serif;
-    font-size:18px;
-    letter-spacing:.03em;
-    color:var(--gold-bright);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-    transition: transform .25s;
-  }
-  .score-pill.bump{ animation: bump .4s ease; }
-  @keyframes bump{ 0%{transform:scale(1);} 35%{transform:scale(1.18);} 100%{transform:scale(1);} }
-  .luck-pill{
-    font-size:10px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:var(--text-dim);
-    background: rgba(255,255,255,.05);
-    border:1px solid var(--line-white);
-    padding:3px 9px;
-    border-radius:999px;
-  }
-  .luck-pill.active{ color:#06231a; background:linear-gradient(135deg,var(--gold-bright),var(--gold)); border-color:transparent; font-weight:700; }
-
-  /* ---------- MAIN ---------- */
-  main{ flex:1; display:flex; flex-direction:column; align-items:center; padding:6px 18px 0; }
-
-  .wheel-zone{
-    position:relative;
-    width:100%;
-    max-width:300px;
-    margin-top:6px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-  }
-  .pointer{
-    width:0; height:0;
-    border-left:12px solid transparent;
-    border-right:12px solid transparent;
-    border-top:20px solid var(--gold-bright);
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
-    margin-bottom:-4px;
-    z-index:3;
-  }
-  .wheel-outer{
-    position:relative;
-    width:270px; height:270px;
-    border-radius:50%;
-    padding:8px;
-    background: conic-gradient(from 0deg, var(--gold-bright), var(--gold-deep), var(--gold-bright));
-    box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 2px rgba(255,255,255,.05);
-  }
-  .wheel-inner{
-    position:relative;
-    width:100%; height:100%;
-    border-radius:50%;
-    overflow:hidden;
-    background:#0c2a1f;
-    transition: transform 3.4s cubic-bezier(.12,.83,.1,1);
-    transform: rotate(0deg);
-  }
-  .wheel-inner svg{ width:100%; height:100%; display:block; }
-  .wheel-center{
-    position:absolute; top:50%; left:50%;
-    width:56px; height:56px;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    background: radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold-deep));
-    border:3px solid #06231a;
-    display:flex; align-items:center; justify-content:center;
-    font-size:22px;
-    z-index:4;
-    box-shadow:0 4px 10px rgba(0,0,0,.4);
-  }
-
-  #spinBtn{
-    margin-top:16px;
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:14px;
-    font-family:'Bebas Neue',sans-serif;
-    font-size:20px;
-    letter-spacing:.08em;
-    cursor:pointer;
-    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
-    color:#0a2b1f;
-    box-shadow: 0 6px 18px rgba(255,204,51,.25);
-    transition: transform .15s, box-shadow .15s, filter .2s;
-  }
-  #spinBtn:active{ transform: scale(.97); }
-  #spinBtn:disabled{ filter:grayscale(.7) brightness(.6); cursor:not-allowed; box-shadow:none; }
-
-  /* ---------- CLUES ---------- */
-  .clues-panel{
-    width:100%;
-    margin-top:20px;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-  }
-  .clue-card{
-    background: var(--panel);
-    border:1px solid var(--panel-edge);
-    border-radius:12px;
-    padding:9px 10px;
-    min-height:56px;
-    display:flex;
-    flex-direction:column;
     justify-content:center;
-    gap:2px;
-    opacity:.35;
-    transform: scale(.96);
-    transition: opacity .25s, transform .25s;
-  }
-  .clue-card.revealed{
-    opacity:1;
-    transform: scale(1);
-    animation: reveal-pop .45s cubic-bezier(.2,.9,.3,1.3);
-  }
-  @keyframes reveal-pop{
-    0%{ transform: scale(.6) rotate(-4deg); opacity:0; }
-    60%{ transform: scale(1.08) rotate(2deg); opacity:1; }
-    100%{ transform: scale(1) rotate(0); }
-  }
-  .clue-label{ font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); }
-  .clue-value{ font-family:'Bebas Neue',sans-serif; font-size:16px; color:var(--gold-bright); letter-spacing:.02em; line-height:1.15; }
-  .clue-card.revealed .clue-value{ color:var(--text); }
-  .clue-card:nth-child(6){ grid-column: 1 / -1; }
-
-  /* ---------- GUESS ---------- */
-  .guess-panel{
-    width:100%;
-    margin-top:18px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-  #guessInput{
-    width:100%;
-    padding:13px 16px;
-    border-radius:12px;
-    border:1px solid var(--panel-edge);
-    background: rgba(255,255,255,.04);
-    color:var(--text);
-    font-size:15px;
-    font-family:'Inter',sans-serif;
-    outline:none;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  #guessInput:focus{ border-color:var(--gold); box-shadow:0 0 0 3px rgba(255,204,51,.15); }
-  #guessInput.shake{ animation: shake .4s; border-color: var(--red); }
-  @keyframes shake{
-    0%,100%{transform:translateX(0);}
-    20%{transform:translateX(-8px);}
-    40%{transform:translateX(8px);}
-    60%{transform:translateX(-5px);}
-    80%{transform:translateX(5px);}
-  }
-  .guess-actions{ display:flex; gap:10px; }
-  .guess-actions button{
-    flex:1;
-    padding:12px;
-    border-radius:12px;
-    border:none;
-    font-family:'Bebas Neue',sans-serif;
-    font-size:16px;
-    letter-spacing:.05em;
-    cursor:pointer;
-    transition: transform .15s, filter .2s;
-  }
-  .guess-actions button:active{ transform:scale(.96); }
-  #guessBtn{ background: linear-gradient(135deg,var(--green-ok),#1f9e5c); color:#06231a; }
-  #giveupBtn{ background: rgba(255,255,255,.06); color:var(--text-dim); border:1px solid var(--line-white); }
-  .guess-panel.hidden, .clues-panel.hidden, .wheel-zone.hidden{ display:none; }
-
-  #feedback{
-    min-height:20px;
-    text-align:center;
-    font-size:13px;
-    font-weight:600;
-    margin-top:2px;
-  }
-  #feedback.ok{ color:var(--green-ok); }
-  #feedback.bad{ color:var(--red); }
-
-  /* ---------- ROUND END ---------- */
-  #roundEnd{
-    width:100%;
-    margin-top:16px;
-    background:var(--panel);
-    border:1px solid var(--panel-edge);
-    border-radius:14px;
-    padding:16px;
-    text-align:center;
-  }
-  #roundEnd h3{ font-family:'Bebas Neue',sans-serif; font-size:22px; margin:0 0 4px; color:var(--gold-bright); letter-spacing:.03em; }
-  #roundEnd p{ margin:2px 0; font-size:13px; color:var(--text-dim); }
-  #nextBtn{
-    margin-top:12px;
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:12px;
-    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
-    color:#0a2b1f;
-    font-family:'Bebas Neue',sans-serif;
-    font-size:17px;
-    letter-spacing:.06em;
-    cursor:pointer;
-  }
-
-  /* ---------- START OVERLAY ---------- */
-  #startOverlay{
-    position:fixed; inset:0; z-index:50;
-    background: radial-gradient(circle at 50% 20%, #12503a, #051d15 75%);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:32px;
-    text-align:center;
-  }
-  #startOverlay .badge{
-    font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold-bright);
-    border:1px solid rgba(255,204,51,.4); border-radius:999px; padding:5px 14px; margin-bottom:18px;
-    animation: pulse-badge 2.4s ease-in-out infinite;
-  }
-  @keyframes pulse-badge{ 0%,100%{opacity:.7;} 50%{opacity:1;} }
-  #startOverlay h1{
-    font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:.95; margin:0;
-    background: linear-gradient(180deg, #fff, var(--gold-bright) 55%, var(--gold-deep));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    letter-spacing:.03em;
-    text-shadow:0 6px 30px rgba(255,204,51,.25);
-  }
-  #startOverlay .sub{ color:var(--text-dim); font-size:14px; margin:14px 0 28px; max-width:320px; line-height:1.6; }
-  #startOverlay .rules{
-    text-align:left; width:100%; max-width:320px; margin:0 0 30px;
-    display:flex; flex-direction:column; gap:10px;
-  }
-  #startOverlay .rule{ display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--text); }
-  #startOverlay .rule .ico{ font-size:18px; }
-  #startBtn{
-    padding:16px 52px;
-    border:none;
-    border-radius:999px;
-    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
-    color:#0a2b1f;
-    font-family:'Bebas Neue',sans-serif;
-    font-size:24px;
-    letter-spacing:.08em;
-    cursor:pointer;
-    box-shadow: 0 10px 30px rgba(255,204,51,.35);
-    animation: start-glow 2s ease-in-out infinite;
-  }
-  @keyframes start-glow{
-    0%,100%{ box-shadow:0 10px 30px rgba(255,204,51,.35); transform:translateY(0); }
-    50%{ box-shadow:0 14px 40px rgba(255,204,51,.55); transform:translateY(-3px); }
-  }
-  #startBtn:active{ transform:scale(.95); }
-  .fade-out{ animation: fadeOutOverlay .5s forwards; }
-  @keyframes fadeOutOverlay{ to{ opacity:0; visibility:hidden; } }
-
-  /* ---------- BOTTOM NAV ---------- */
-  .bottom-nav{
-    position:fixed; bottom:0; left:0; right:0; z-index:20;
-    display:flex; justify-content:center;
-    padding:12px 18px calc(12px + env(safe-area-inset-bottom));
-    background: linear-gradient(180deg, transparent, rgba(6,25,18,.9) 30%);
-  }
-  #shopBtn{
-    width:100%; max-width:480px;
-    padding:14px;
-    border:none; border-radius:14px;
-    background: linear-gradient(135deg, #1a5c41, #0d3a2a);
-    border:1px solid var(--panel-edge);
-    color:var(--gold-bright);
-    font-family:'Bebas Neue',sans-serif;
-    font-size:18px; letter-spacing:.06em;
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    cursor:pointer;
-  }
-
-  /* ---------- SHOP MODAL ---------- */
-  .modal{
-    position:fixed; inset:0; z-index:60;
-    background: rgba(3,15,10,.72);
-    backdrop-filter: blur(3px);
-    display:flex; align-items:flex-end; justify-content:center;
-  }
-  .modal.hidden{ display:none; }
-  .modal-card{
-    width:100%; max-width:480px;
-    background: linear-gradient(180deg, #123a2a, #0a2419);
-    border:1px solid var(--panel-edge);
-    border-radius:20px 20px 0 0;
-    padding:22px 20px calc(24px + env(safe-area-inset-bottom));
-    animation: sheet-up .3s ease;
-  }
-  @keyframes sheet-up{ from{ transform:translateY(30px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
-  .modal-card h2{
-    font-family:'Bebas Neue',sans-serif; font-size:24px; margin:0 0 4px; color:var(--gold-bright); letter-spacing:.04em;
-  }
-  .modal-card .modal-sub{ font-size:12px; color:var(--text-dim); margin-bottom:18px; }
-  .shop-item{
-    display:flex; align-items:center; justify-content:space-between;
-    background: rgba(255,255,255,.04);
-    border:1px solid var(--line-white);
-    border-radius:14px;
-    padding:14px;
-    margin-bottom:12px;
-  }
-  .shop-item .info{ display:flex; flex-direction:column; gap:3px; }
-  .shop-item .tag{
-    font-family:'Bebas Neue',sans-serif; font-size:19px; letter-spacing:.04em; color:var(--text);
-  }
-  .shop-item .price{ font-size:12px; color:var(--gold-bright); }
-  .shop-item button{
-    padding:10px 16px;
-    border:none; border-radius:10px;
-    font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:.04em;
-    background: linear-gradient(135deg,var(--gold-bright),var(--gold));
-    color:#0a2b1f; cursor:pointer;
-  }
-  .shop-item button:disabled{ background:rgba(255,255,255,.08); color:var(--text-dim); cursor:not-allowed; }
-
-  /* Promo Box Styles */
-  .promo-box {
-    background: rgba(0,0,0,.25);
-    border: 1px dashed var(--panel-edge);
-    border-radius: 14px;
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  .promo-title {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--gold-bright);
-    margin-bottom: 8px;
-    font-weight: 700;
-  }
-  .promo-row {
-    display: flex;
-    gap: 8px;
-  }
-  #promoInput {
-    flex: 1;
-    background: rgba(255,255,255,.06);
-    border: 1px solid var(--line-white);
-    border-radius: 10px;
-    padding: 8px 12px;
-    color: var(--text);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: .05em;
-    outline: none;
-    text-transform: uppercase;
-  }
-  #promoInput:focus { border-color: var(--gold); }
-  #redeemBtn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--green-ok), #1f9e5c);
-    color: #06231a;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 15px;
-    cursor: pointer;
-  }
-  #promoFeedback {
-    font-size: 11px;
-    margin-top: 6px;
-    min-height: 14px;
-  }
-
-  #closeShop{
-    width:100%; margin-top:6px; padding:12px; border-radius:12px; border:1px solid var(--line-white);
-    background:transparent; color:var(--text-dim); font-family:'Inter'; font-size:13px; cursor:pointer;
-  }
-
-  /* ---------- GOAL OVERLAY ---------- */
-  #goalOverlay{
-    position:fixed; inset:0; z-index:100;
-    display:flex; align-items:center; justify-content:center;
-    background: radial-gradient(circle, rgba(255,204,51,.25), rgba(3,15,10,.88) 65%);
     overflow:hidden;
   }
-  #goalOverlay.hidden{ display:none; }
-  .goal-text{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:19vw;
-    max-font-size:90px;
-    color:var(--gold-bright);
-    -webkit-text-stroke: 2px #7a4e00;
-    text-shadow: 0 0 40px rgba(255,204,51,.8), 0 8px 0 #7a4e00;
-    letter-spacing:.02em;
-    animation: goal-bounce .9s cubic-bezier(.22,1.6,.4,1) both, goal-shake 2.4s ease-in-out .9s infinite;
-    z-index:2;
+  #frame{
+    position:relative;
+    width:100%;
+    max-width:430px;
+    height:100vh;
+    max-height:930px;
+    background:var(--bg);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 0 60px rgba(139,92,246,.15);
   }
-  @keyframes goal-bounce{
-    0%{ transform: scale(0) rotate(-8deg); opacity:0; }
-    55%{ transform: scale(1.25) rotate(3deg); opacity:1; }
-    75%{ transform: scale(.92) rotate(-2deg); }
-    100%{ transform: scale(1) rotate(0); }
-  }
-  @keyframes goal-shake{
-    0%,100%{ transform: translateX(0) scale(1); }
-    25%{ transform: translateX(-2px) scale(1.02); }
-    75%{ transform: translateX(2px) scale(1.02); }
-  }
-  .goal-sub{
-    position:absolute; bottom:22%; left:0; right:0; text-align:center;
-    font-family:'Bebas Neue',sans-serif; font-size:22px; color:#fff; letter-spacing:.08em;
-    animation: fade-in-up .6s ease .5s both;
-  }
-  @keyframes fade-in-up{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
-  #goalContinue{
-    position:absolute; bottom:12%; left:50%; transform:translateX(-50%);
-    padding:12px 34px; border:none; border-radius:999px;
-    background:linear-gradient(135deg,var(--gold-bright),var(--gold)); color:#0a2b1f;
-    font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:.05em; cursor:pointer;
-    animation: fade-in-up .6s ease .8s both;
-  }
-  .confetti{
-    position:absolute; top:-10px;
-    width:9px; height:14px;
-    opacity:.95;
-    animation: confetti-fall linear forwards;
-  }
-  @keyframes confetti-fall{
-    to{ transform: translateY(112vh) rotate(540deg); opacity:0; }
+  @media (min-width:500px){
+    #frame{ border-radius:36px; margin:16px 0; border:1px solid var(--border);}
   }
 
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  /* ---------- Top bar ---------- */
+  #topbar{
+    position:absolute; top:0; left:0; right:0; z-index:20;
+    display:flex; align-items:center; justify-content:center;
+    padding:14px 12px 8px;
+    gap:22px;
+    pointer-events:none;
   }
+  #topbar.solid{ position:relative; background:var(--bg); border-bottom:1px solid var(--border); pointer-events:auto;}
+  .feed-toggle{ display:flex; gap:18px; pointer-events:auto;}
+  .feed-toggle button{
+    background:none; border:none; color:rgba(255,255,255,.65); font-size:16px; font-weight:600;
+    padding:4px 2px; position:relative; cursor:pointer;
+  }
+  .feed-toggle button.active{ color:#fff; }
+  .feed-toggle button.active::after{
+    content:""; position:absolute; bottom:-6px; left:50%; transform:translateX(-50%);
+    width:20px; height:3px; background:#fff; border-radius:3px;
+  }
+  #searchBtn{
+    position:absolute; right:14px; top:16px; pointer-events:auto; background:none; border:none; color:#fff; cursor:pointer;
+  }
+  .brand{
+    display:flex; align-items:center; gap:8px; pointer-events:auto; position:absolute; left:16px; top:16px;
+  }
+  .brand .dot{ width:10px; height:10px; border-radius:50%; background:var(--grad); box-shadow:0 0 10px var(--accent2);}
+  .brand span{ font-weight:800; font-size:18px; letter-spacing:.3px;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;}
+
+  /* ---------- Tabs container ---------- */
+  #tabs{ flex:1; min-height:0; position:relative; }
+  .tab-panel{ position:absolute; inset:0; display:none; flex-direction:column; }
+  .tab-panel.active{ display:flex; }
+
+  /* ---------- Home / feed ---------- */
+  #feed{
+    flex:1; overflow-y:scroll; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch;
+  }
+  #feed::-webkit-scrollbar{ display:none; }
+  .post{
+    position:relative; height:100%; scroll-snap-align:start; scroll-snap-stop:always;
+    display:flex; align-items:flex-end; overflow:hidden; background:#000;
+  }
+  .post-bg{
+    position:absolute; inset:0; background-size:cover; background-position:center;
+    animation:drift 12s ease-in-out infinite alternate;
+  }
+  @keyframes drift{ from{ transform:scale(1);} to{ transform:scale(1.12);} }
+  .post video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .post-shade{
+    position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.15) 55%, rgba(0,0,0,.85) 100%);
+  }
+  .vid-spinner{
+    position:absolute; top:50%; left:50%; width:38px; height:38px; margin:-19px 0 0 -19px;
+    border:3px solid rgba(255,255,255,.25); border-top-color:#fff; border-radius:50%; animation:vspin .8s linear infinite; z-index:1;
+  }
+  @keyframes vspin{ to{ transform:rotate(360deg); } }
+  .vid-error{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#fff; font-size:13px; font-weight:600;
+    background:rgba(0,0,0,.55); padding:8px 14px; border-radius:8px; z-index:1; white-space:nowrap;
+  }
+  .post-body{ position:relative; z-index:2; width:100%; display:flex; align-items:flex-end; padding:14px 70px 22px 14px; gap:10px;}
+  .post-info{ flex:1; min-width:0; color:#fff;}
+  .post-info .uname{ font-weight:700; font-size:15.5px; display:flex; align-items:center; gap:8px;}
+  .follow-chip{ font-size:11px; font-weight:700; border:1px solid #fff; border-radius:5px; padding:1px 7px; cursor:pointer; background:rgba(0,0,0,.25);}
+  .follow-chip.following{ opacity:.55; }
+  .post-info .caption{ font-size:14.5px; margin-top:6px; line-height:1.35; color:#fff;}
+  .post-info .hashtags{ color:#cfe8ff; font-weight:600; }
+  .music-row{ display:flex; align-items:center; gap:6px; margin-top:8px; color:#fff; font-size:13px; overflow:hidden; white-space:nowrap; max-width:230px;}
+  .music-row .marquee{ display:inline-block; animation:mq 8s linear infinite; }
+  @keyframes mq{ 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+
+  .actions{ display:flex; flex-direction:column; align-items:center; gap:18px; z-index:2; padding-bottom:4px;}
+  .actions .avatar-wrap{ position:relative; margin-bottom:4px;}
+  .actions .avatar{ width:46px; height:46px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; color:#fff;}
+  .actions .plus-badge{ position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:19px; height:19px; border-radius:50%; background:var(--heart); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; color:#fff; cursor:pointer;}
+  .act-btn{ display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:none; color:#fff; cursor:pointer;}
+  .act-btn svg{ width:34px; height:34px; filter:drop-shadow(0 1px 3px rgba(0,0,0,.5)); }
+  .act-btn span{ font-size:12.5px; font-weight:700; }
+  .act-btn.liked svg{ color:var(--heart); }
+  .act-btn.saved svg{ color:#ffd54a; }
+  .disc{
+    width:38px; height:38px; border-radius:50%; background:conic-gradient(from 0deg,#333,#111,#333);
+    border:3px solid #444; display:flex; align-items:center; justify-content:center; animation:spin 4s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+  .disc::after{ content:""; width:10px; height:10px; border-radius:50%; background:var(--grad);}
+
+  .empty-hint{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text-faint); font-size:14px; padding:0 40px; text-align:center;}
+
+  /* ---------- Comments sheet ---------- */
+  #overlay{ position:absolute; inset:0; background:rgba(0,0,0,.55); z-index:40; display:none; }
+  #overlay.show{ display:block; }
+  #commentSheet{
+    position:absolute; left:0; right:0; bottom:0; z-index:50; background:var(--panel);
+    border-radius:18px 18px 0 0; height:62%; transform:translateY(100%); transition:transform .28s ease;
+    display:flex; flex-direction:column; border:1px solid var(--border); border-bottom:none;
+  }
+  #commentSheet.show{ transform:translateY(0); }
+  .sheet-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border); font-weight:700;}
+  .sheet-head button{ background:none; border:none; color:var(--text-dim); cursor:pointer; }
+  .comments-list{ flex:1; overflow-y:auto; padding:10px 16px; }
+  .comment-item{ display:flex; gap:10px; padding:9px 0; }
+  .comment-item .cavatar{ width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; color:#fff;}
+  .comment-item .cbody .cuser{ font-size:12.5px; color:var(--text-faint); font-weight:600;}
+  .comment-item .cbody .ctext{ font-size:14px; margin-top:2px; }
+  .comment-input-row{ display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--border); align-items:center;}
+  .comment-input-row input{ flex:1; background:var(--panel-2); border:1px solid var(--border); border-radius:20px; padding:10px 14px; color:var(--text); font-size:14px; outline:none;}
+  .comment-input-row button{ background:var(--grad); border:none; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+
+  /* ---------- Bottom nav ---------- */
+  #nav{
+    display:flex; align-items:center; justify-content:space-around; padding:8px 6px 10px;
+    background:var(--bg); border-top:1px solid var(--border); z-index:30; position:relative;
+  }
+  .nav-btn{ background:none; border:none; color:var(--text-faint); display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; font-size:10.5px; font-weight:600; padding:4px 6px;}
+  .nav-btn svg{ width:25px; height:25px; }
+  .nav-btn.active{ color:#fff; }
+  #plusBtn{ background:var(--grad); border-radius:9px; width:46px; height:32px; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; box-shadow:0 0 14px rgba(236,72,153,.5);}
+  #plusBtn svg{ width:22px; height:22px; color:#fff; }
+  .badge-dot{ position:absolute; top:0; right:-2px; width:8px; height:8px; border-radius:50%; background:var(--heart); border:2px solid var(--bg);}
+  .nav-icon-wrap{ position:relative; }
+
+  /* ---------- Generic scroll panels ---------- */
+  .panel-scroll{ flex:1; overflow-y:auto; padding-top:58px; }
+  .panel-header{
+    position:absolute; top:0; left:0; right:0; z-index:15; background:var(--bg); border-bottom:1px solid var(--border);
+    padding:16px; font-size:19px; font-weight:800;
+  }
+
+  /* ---------- Friends ---------- */
+  .friend-row{ display:flex; align-items:center; gap:12px; padding:11px 16px; }
+  .favatar{ width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; flex-shrink:0;}
+  .friend-meta{ flex:1; min-width:0;}
+  .friend-meta .fname{ font-weight:700; font-size:14.5px;}
+  .friend-meta .fsub{ font-size:12.5px; color:var(--text-faint); margin-top:2px;}
+  .follow-btn{ font-size:13px; font-weight:700; border-radius:7px; padding:7px 16px; border:none; cursor:pointer; background:var(--heart); color:#fff; white-space:nowrap;}
+  .follow-btn.following{ background:var(--panel-2); color:var(--text-dim); border:1px solid var(--border);}
+  .section-label{ padding:14px 16px 6px; font-size:13px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:.4px;}
+
+  /* ---------- Inbox ---------- */
+  .notif-row{ display:flex; align-items:center; gap:12px; padding:11px 16px; }
+  .notif-icon{ width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--panel-2); flex-shrink:0;}
+  .notif-text{ font-size:13.5px; line-height:1.4; flex:1;}
+  .notif-text b{ font-weight:700;}
+  .notif-time{ font-size:12px; color:var(--text-faint); margin-top:2px;}
+  .msg-row{ display:flex; align-items:center; gap:12px; padding:11px 16px; cursor:pointer;}
+  .msg-row:active{ background:var(--panel-2); }
+  .msg-preview{ font-size:13px; color:var(--text-faint); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:210px;}
+
+  /* chat */
+  #chatView{ position:absolute; inset:0; background:var(--bg); z-index:35; display:none; flex-direction:column; }
+  #chatView.show{ display:flex; }
+  .chat-header{ display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--border);}
+  .chat-header button{ background:none; border:none; color:#fff; cursor:pointer;}
+  .chat-messages{ flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:8px;}
+  .bubble{ max-width:75%; padding:9px 13px; border-radius:16px; font-size:14px; line-height:1.35;}
+  .bubble.them{ background:var(--panel-2); align-self:flex-start; border-bottom-left-radius:4px;}
+  .bubble.me{ background:var(--grad); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
+  .chat-input-row{ display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--border);}
+  .chat-input-row input{ flex:1; background:var(--panel-2); border:1px solid var(--border); border-radius:20px; padding:10px 14px; color:var(--text); font-size:14px; outline:none;}
+  .chat-input-row button{ background:var(--grad); border:none; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+
+  /* ---------- Profile ---------- */
+  .profile-top{ display:flex; flex-direction:column; align-items:center; padding:10px 16px 6px; text-align:center;}
+  .pavatar{ width:88px; height:88px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:800; color:#fff; box-shadow:0 0 0 3px var(--bg), 0 0 0 5px var(--accent2);}
+  .pname{ font-weight:800; font-size:18px; margin-top:10px;}
+  .puser{ color:var(--text-faint); font-size:13.5px; margin-top:2px;}
+  .pstats{ display:flex; gap:26px; margin-top:14px;}
+  .pstats div{ text-align:center; cursor:default;}
+  .pstats b{ display:block; font-size:16px; font-weight:800;}
+  .pstats span{ font-size:12px; color:var(--text-faint); }
+  .pbio{ font-size:13.5px; color:var(--text-dim); margin-top:12px; max-width:280px; }
+  .pbtn-row{ display:flex; gap:8px; margin-top:14px; width:100%; max-width:300px;}
+  .pbtn{ flex:1; padding:9px 0; border-radius:8px; font-weight:700; font-size:13.5px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); cursor:pointer;}
+  .ptabs{ display:flex; border-bottom:1px solid var(--border); margin-top:18px; }
+  .ptab{ flex:1; text-align:center; padding:11px 0; font-size:13px; font-weight:700; color:var(--text-faint); cursor:pointer; border-bottom:2px solid transparent;}
+  .ptab.active{ color:#fff; border-color:#fff; }
+  .pgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2px; }
+  .pgrid .cell{ aspect-ratio:9/14; position:relative; overflow:hidden; }
+  .pgrid .cell .plays{ position:absolute; bottom:4px; left:5px; color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; gap:3px; text-shadow:0 1px 2px rgba(0,0,0,.6);}
+
+  /* ---------- Founder badge ---------- */
+  .founder-badge{
+    display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:800; letter-spacing:.3px;
+    padding:3px 10px 3px 7px; border-radius:20px; margin-top:8px; color:#241a05;
+    background:linear-gradient(135deg,#ffd76a,#ffb347); box-shadow:0 0 12px rgba(255,183,71,.45);
+  }
+  .founder-mini{
+    display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%;
+    background:linear-gradient(135deg,#ffd76a,#ffb347); flex-shrink:0; color:#241a05; font-size:10px;
+  }
+
+  /* ---------- Panel header w/ actions ---------- */
+  .panel-header{ display:flex; align-items:center; justify-content:space-between; }
+  #settingsBtn{ background:none; border:none; color:#fff; cursor:pointer; font-size:22px; }
+  .ptab{ display:flex; align-items:center; justify-content:center; gap:5px; }
+  .ptab-icon{ font-size:15px; display:inline-flex; }
+
+  /* ---------- Settings screen ---------- */
+  #settingsView{ position:absolute; inset:0; background:var(--bg); z-index:35; display:none; flex-direction:column; }
+  #settingsView.show{ display:flex; }
+  .settings-scroll{ flex:1; overflow-y:auto; padding-bottom:24px; }
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:13px 16px; border-bottom:1px solid var(--border);}
+  .settings-row .srow-label{ font-size:14px; font-weight:600; }
+  .settings-row .srow-sub{ font-size:12px; color:var(--text-faint); margin-top:2px; }
+  .settings-row select{ background:var(--panel-2); color:var(--text); border:1px solid var(--border); border-radius:7px; padding:7px 8px; font-size:13px; flex-shrink:0; }
+  .settings-row.danger .srow-label{ color:var(--heart); }
+  .settings-row.clickable{ cursor:pointer; }
+  .settings-row.clickable:active{ background:var(--panel-2); }
+  .switch{ position:relative; width:42px; height:24px; flex-shrink:0; display:inline-block; }
+  .switch input{ opacity:0; width:0; height:0; position:absolute; }
+  .switch .slider{ position:absolute; inset:0; background:var(--panel-2); border:1px solid var(--border); border-radius:24px; cursor:pointer; transition:.2s; }
+  .switch .slider::before{ content:""; position:absolute; width:18px; height:18px; left:2px; top:2px; background:#fff; border-radius:50%; transition:.2s; }
+  .switch input:checked + .slider{ background:var(--grad); border-color:transparent; }
+  .switch input:checked + .slider::before{ transform:translateX(18px); }
+
+  /* ---------- Onboarding ---------- */
+  #onboarding{ position:absolute; inset:0; background:var(--bg); z-index:100; display:none; flex-direction:column; }
+  #onboarding.show{ display:flex; }
+  .ob-step{ position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; padding:36px 30px; text-align:center; overflow-y:auto; }
+  .ob-step.active{ display:flex; }
+  .ob-logo{ width:110px; height:110px; border-radius:32px; background:var(--grad); display:flex; align-items:center; justify-content:center; font-size:46px; font-weight:900; color:#fff; box-shadow:0 0 50px rgba(236,72,153,.5); animation:obPulse 1.6s ease-in-out infinite; }
+  @keyframes obPulse{ 0%,100%{ transform:scale(1); box-shadow:0 0 40px rgba(236,72,153,.4);} 50%{ transform:scale(1.08); box-shadow:0 0 65px rgba(139,92,246,.6);} }
+  .ob-title{ font-size:30px; font-weight:900; margin-top:22px; letter-spacing:.5px; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .ob-welcome-title{ font-size:23px; font-weight:800; margin-top:20px; }
+  .ob-welcome-sub{ font-size:14px; color:var(--text-dim); margin-top:10px; max-width:280px; line-height:1.55; }
+  .ob-btn{ margin-top:28px; background:var(--grad); border:none; color:#fff; font-weight:700; font-size:15px; padding:13px 38px; border-radius:26px; cursor:pointer; box-shadow:0 4px 20px rgba(236,72,153,.35); }
+  .ob-form{ width:100%; max-width:320px; text-align:left; margin:auto; }
+  .ob-form h2{ font-size:20px; font-weight:800; margin-bottom:4px; text-align:center; }
+  .ob-form p.ob-formsub{ font-size:13px; color:var(--text-faint); text-align:center; margin-bottom:18px; }
+  .ob-error{ color:var(--heart); font-size:12.5px; margin-top:10px; display:none; }
+  .ob-error.show{ display:block; }
+
+  /* ---------- Light theme ---------- */
+  body.light{
+    --bg:#f6f6f8; --panel:#ffffff; --panel-2:#eef0f3; --border:#e3e4e8; --text:#131316; --text-dim:#55555e; --text-faint:#8b8b93;
+  }
+
+  /* ---------- Modals ---------- */
+  .modal-overlay{ position:absolute; inset:0; background:rgba(0,0,0,.6); z-index:60; display:none; align-items:flex-end; justify-content:center;}
+  .modal-overlay.show{ display:flex; }
+  .modal-overlay.center{ align-items:center; }
+  .sheet{ background:var(--panel); width:100%; border-radius:18px 18px 0 0; padding:18px 18px 26px; border:1px solid var(--border); border-bottom:none; }
+  .modal-overlay.center .sheet{ border-radius:16px; border-bottom:1px solid var(--border); max-width:320px; }
+  .sheet h3{ font-size:16px; font-weight:800; margin-bottom:14px; }
+  .upload-opt{ display:flex; align-items:center; gap:12px; padding:13px 6px; border-bottom:1px solid var(--border); cursor:pointer;}
+  .upload-opt:last-child{ border-bottom:none; }
+  .upload-opt .oicon{ width:40px; height:40px; border-radius:10px; background:var(--panel-2); display:flex; align-items:center; justify-content:center;}
+  .upload-opt .odim{ opacity:.4; cursor:default; }
+  .oinfo b{ display:block; font-size:14px; }
+  .oinfo span{ font-size:12px; color:var(--text-faint); }
+  .field-label{ font-size:12.5px; color:var(--text-faint); margin:12px 0 5px; font-weight:600;}
+  .field-input{ width:100%; background:var(--panel-2); border:1px solid var(--border); border-radius:9px; padding:10px 12px; color:var(--text); font-size:14px; outline:none;}
+  textarea.field-input{ resize:none; min-height:60px; font-family:inherit; }
+  .modal-btns{ display:flex; gap:10px; margin-top:16px;}
+  .modal-btns button{ flex:1; padding:11px 0; border-radius:9px; font-weight:700; font-size:14px; border:none; cursor:pointer;}
+  .btn-ghost{ background:var(--panel-2); color:var(--text); border:1px solid var(--border) !important; }
+  .btn-primary{ background:var(--grad); color:#fff; }
+  .preview-video{ width:100%; max-height:220px; border-radius:12px; background:#000; margin-top:4px; }
+  .color-row{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;}
+  .color-swatch{ width:30px; height:30px; border-radius:50%; cursor:pointer; border:2px solid transparent;}
+  .color-swatch.sel{ border-color:#fff; }
+
+  #toast{
+    position:absolute; left:50%; bottom:110px; transform:translateX(-50%) translateY(20px); z-index:80;
+    background:rgba(30,30,34,.95); color:#fff; padding:10px 18px; border-radius:10px; font-size:13.5px; font-weight:600;
+    opacity:0; transition:all .25s ease; pointer-events:none; white-space:nowrap; border:1px solid var(--border);
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
+<div id="frame">
 
-<div id="app">
-
-  <header>
-    <div class="title-block">
-      <h1 class="display">TRANSFER ÇARKI</h1>
-      <span>Gizli Futbolcuyu Bul</span>
+  <div id="onboarding">
+    <div class="ob-step active" id="obStep1">
+      <div class="ob-logo">G</div>
+      <div class="ob-title">Glowo</div>
     </div>
-    <div class="stats">
-      <div class="score-pill" id="scorePill">0 PUAN</div>
-      <div class="luck-pill" id="luckPill">Şans: 1X</div>
+    <div class="ob-step" id="obStep2">
+      <div class="ob-logo" style="width:80px;height:80px;font-size:34px;animation:none;">G</div>
+      <div class="ob-welcome-title">Glowo'ya Hoşgeldin! ✨</div>
+      <div class="ob-welcome-sub">Kısa videolar paylaş, arkadaşlarını keşfet ve eğlenceye katıl. Başlamak için birkaç bilgiye ihtiyacımız var.</div>
+      <button class="ob-btn" id="obStartBtn">Hesap Oluştur</button>
     </div>
-  </header>
+    <div class="ob-step" id="obStep3">
+      <div class="ob-form">
+        <h2>Hesabını Oluştur</h2>
+        <p class="ob-formsub">Bilgilerin sadece bu cihazda saklanır</p>
+        <div class="field-label">Ad Soyad</div>
+        <input class="field-input" id="obName" placeholder="Adını yaz">
+        <div class="field-label">Kullanıcı Adı</div>
+        <input class="field-input" id="obUsername" placeholder="kullaniciadi">
+        <div class="field-label">Doğum Tarihi</div>
+        <input class="field-input" id="obBirthdate" type="date">
+        <div class="ob-error" id="obError"></div>
+        <button class="ob-btn" id="obSubmitBtn" style="width:100%;margin-top:20px;">Glowo'ya Katıl</button>
+      </div>
+    </div>
+  </div>
 
-  <main>
-    <div class="wheel-zone" id="wheelZone">
-      <div class="pointer"></div>
-      <div class="wheel-outer">
-        <div class="wheel-inner" id="wheelInner">
-          <svg id="wheelSvg" viewBox="0 0 300 300"></svg>
+  <div id="topbar">
+    <div class="brand"><span class="dot"></span><span>Glowo</span></div>
+    <div class="feed-toggle">
+      <button data-filter="following">Takip Ettiklerin</button>
+      <button data-filter="foryou" class="active">Öneriler</button>
+    </div>
+    <button id="searchBtn" title="Ara"></button>
+  </div>
+
+  <div id="tabs">
+    <!-- HOME -->
+    <div class="tab-panel active" id="tab-home">
+      <div id="feed"></div>
+    </div>
+
+    <!-- FRIENDS -->
+    <div class="tab-panel" id="tab-friends">
+      <div class="panel-header">Arkadaşlar</div>
+      <div class="panel-scroll" id="friendsScroll"></div>
+    </div>
+
+    <!-- INBOX -->
+    <div class="tab-panel" id="tab-inbox">
+      <div class="panel-header">Gelen Kutusu</div>
+      <div class="panel-scroll" id="inboxScroll"></div>
+      <div id="chatView">
+        <div class="chat-header">
+          <button id="chatBack"></button>
+          <div class="favatar" id="chatAvatar" style="width:34px;height:34px;font-size:13px;"></div>
+          <div style="font-weight:700;font-size:14.5px;" id="chatName"></div>
         </div>
-        <div class="wheel-center">⚽</div>
-      </div>
-      <button id="spinBtn">ÇARKI ÇEVİR</button>
-    </div>
-
-    <div class="clues-panel" id="cluesPanel"></div>
-
-    <div id="feedback"></div>
-
-    <div class="guess-panel" id="guessPanel">
-      <input id="guessInput" type="text" placeholder="Futbolcunun adını yaz...">
-      <div class="guess-actions">
-        <button id="guessBtn">TAHMİN ET</button>
-        <button id="giveupBtn">PES ET</button>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-row">
+          <input id="chatInput" placeholder="Mesaj yaz...">
+          <button id="chatSend"></button>
+        </div>
       </div>
     </div>
 
-    <div id="roundEnd" style="display:none;">
-      <h3 id="roundEndTitle"></h3>
-      <p id="roundEndDesc"></p>
-      <button id="nextBtn">SONRAKİ OYUNCU</button>
+    <!-- PROFILE -->
+    <div class="tab-panel" id="tab-profile">
+      <div class="panel-header"><span>Profil</span><button id="settingsBtn"></button></div>
+      <div class="panel-scroll" id="profileScroll"></div>
+      <div id="settingsView">
+        <div class="chat-header">
+          <button id="settingsBack"></button>
+          <div style="font-weight:700;font-size:15px;">Ayarlar</div>
+        </div>
+        <div class="settings-scroll" id="settingsScroll"></div>
+      </div>
     </div>
-  </main>
-
-  <nav class="bottom-nav">
-    <button id="shopBtn">🛒 DÜKKAN</button>
-  </nav>
-</div>
-
-<!-- START OVERLAY -->
-<div id="startOverlay">
-  <div class="badge">Futbolcu Tahmin Oyunu</div>
-  <h1 class="display">TRANSFER<br>ÇARKI</h1>
-  <p class="sub">Çarkı çevir, ipuçlarını topla, gizli futbolcuyu az ipuçla bil. Ne kadar az ipucuyla bulursan o kadar çok puan kazanırsın.</p>
-  <div class="rules">
-    <div class="rule"><span class="ico">🎡</span><span>Her çevirişte kulüp, ülke, mevki, forma no, yaş ya da ekstra ipucu açılır.</span></div>
-    <div class="rule"><span class="ico">⭐</span><span>Efsane oyuncular çok nadir çıkar — çıkarsa GOOOLLLL bonusu kazanırsın!</span></div>
-    <div class="rule"><span class="ico">🛒</span><span>Dükkandan puanla şansını artırıp efsaneleri daha sık yakalayabilirsin.</span></div>
   </div>
-  <button id="startBtn">BAŞLA</button>
-</div>
 
-<!-- SHOP MODAL -->
-<div class="modal hidden" id="shopModal">
-  <div class="modal-card">
-    <h2>🛒 DÜKKAN</h2>
-    <div class="modal-sub">Puanlarını harca, efsane oyuncuların çıkma şansını artır.</div>
-
-    <!-- PROMO CODE BOX -->
-    <div class="promo-box">
-      <div class="promo-title">🎁 PROMOSYON KODU</div>
-      <div class="promo-row">
-        <input type="text" id="promoInput" placeholder="KODU GİRİN (ÖRN: 2026FUT)">
-        <button id="redeemBtn">KULLAN</button>
-      </div>
-      <div id="promoFeedback"></div>
-    </div>
-
-    <div class="shop-item">
-      <div class="info">
-        <div class="tag">5X Şans</div>
-        <div class="price">15.000 Puan</div>
-      </div>
-      <button id="buy5x">SATIN AL</button>
-    </div>
-
-    <div class="shop-item">
-      <div class="info">
-        <div class="tag">10X Şans</div>
-        <div class="price">50.000 Puan</div>
-      </div>
-      <button id="buy10x">SATIN AL</button>
-    </div>
-
-    <button id="closeShop">Kapat</button>
+  <div id="nav">
+    <button class="nav-btn active" data-tab="home"></button>
+    <button class="nav-btn" data-tab="friends"></button>
+    <button id="plusBtn"></button>
+    <button class="nav-btn" data-tab="inbox"><span class="nav-icon-wrap" id="inboxIconWrap"></span></button>
+    <button class="nav-btn" data-tab="profile"></button>
   </div>
-</div>
 
-<!-- GOAL OVERLAY -->
-<div class="hidden" id="goalOverlay">
-  <div class="goal-text display">GOOOLLL!</div>
-  <div class="goal-sub" id="goalSubText"></div>
-  <button id="goalContinue">DEVAM ET</button>
+  <!-- comments -->
+  <div id="overlay"></div>
+  <div id="commentSheet">
+    <div class="sheet-head"><span id="commentCount">0 yorum</span><button id="closeComments">✕</button></div>
+    <div class="comments-list" id="commentsList"></div>
+    <div class="comment-input-row">
+      <input id="commentInput" placeholder="Yorum ekle...">
+      <button id="sendComment"></button>
+    </div>
+  </div>
+
+  <!-- upload modal -->
+  <div class="modal-overlay" id="uploadOverlay">
+    <div class="sheet">
+      <h3>Video Oluştur</h3>
+      <div class="upload-opt" id="pickFileOpt">
+        <div class="oicon"></div>
+        <div class="oinfo"><b>Cihazdan Video Seç</b><span>Galeriden bir video yükle</span></div>
+      </div>
+      <div class="upload-opt odim">
+        <div class="oicon"></div>
+        <div class="oinfo"><b>Kamera ile Çek</b><span>Yakında</span></div>
+      </div>
+      <input type="file" id="fileInput" accept="video/*" style="display:none;">
+      <div class="modal-btns"><button class="btn-ghost" id="cancelUpload">Vazgeç</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay center" id="postOverlay">
+    <div class="sheet">
+      <h3>Gönderiyi Paylaş</h3>
+      <video class="preview-video" id="previewVideo" muted loop autoplay playsinline></video>
+      <div class="ob-error" id="previewWarning" style="margin-top:8px;"></div>
+      <div class="field-label">Açıklama</div>
+      <textarea class="field-input" id="captionInput" placeholder="Bir açıklama yaz... #hashtag"></textarea>
+      <div class="modal-btns">
+        <button class="btn-ghost" id="cancelPost">Vazgeç</button>
+        <button class="btn-primary" id="submitPost">Paylaş</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay center" id="editOverlay">
+    <div class="sheet">
+      <h3>Profili Düzenle</h3>
+      <div class="field-label">Ad</div>
+      <input class="field-input" id="editName">
+      <div class="field-label">Kullanıcı Adı</div>
+      <input class="field-input" id="editUsername">
+      <div class="field-label">Doğum Tarihi</div>
+      <input class="field-input" id="editBirthdate" type="date">
+      <div class="field-label">Biyografi</div>
+      <textarea class="field-input" id="editBio"></textarea>
+      <div class="field-label">Avatar Rengi</div>
+      <div class="color-row" id="colorRow"></div>
+      <div class="modal-btns">
+        <button class="btn-ghost" id="cancelEdit">Vazgeç</button>
+        <button class="btn-primary" id="saveEdit">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay center" id="confirmOverlay">
+    <div class="sheet">
+      <h3 id="confirmTitle">Emin misin?</h3>
+      <div style="font-size:13.5px;color:var(--text-dim);line-height:1.45;" id="confirmText"></div>
+      <div class="modal-btns">
+        <button class="btn-ghost" id="confirmCancel">Vazgeç</button>
+        <button class="modal-btns-danger" id="confirmOk" style="flex:1;padding:11px 0;border-radius:9px;font-weight:700;font-size:14px;border:none;cursor:pointer;background:var(--heart);color:#fff;">Onayla</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
 </div>
 
 <script>
-(function(){
-  // ---------------- AUDIO SYSTEM ----------------
-  function playSpinSound() {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      
-      const duration = 3.4;
-      const totalClicks = 28;
-      
-      for (let i = 0; i < totalClicks; i++) {
-        const progress = i / totalClicks;
-        const time = ctx.currentTime + Math.pow(progress, 1.8) * duration;
-        
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(180 - progress * 80, time);
-        
-        gain.gain.setValueAtTime(0.2, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.start(time);
-        osc.stop(time + 0.04);
-      }
-    } catch(e) {
-      console.log("Ses yürütülemedi:", e);
-    }
-  }
+/* ===================== ICONS ===================== */
+const ICONS = {
+home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>`,
+homeFilled:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 11h3v9h5v-6h4v6h5v-9h3z"/></svg>`,
+friends:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M16 14.3c2.5.3 4.3 2 5 5.7"/></svg>`,
+friendsFilled:`<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.6"/><path d="M2 20.2c.7-4 3.4-6.1 7-6.1s6.3 2.1 7 6.1z"/><circle cx="18" cy="8.5" r="2.8"/><path d="M16.3 13.7c2.7.5 4.4 2.5 5.1 6h-3.9"/></svg>`,
+inbox:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6"/><path d="M3 12l4-7h10l4 7"/><path d="M3 12h5l1.5 3h5L16 12h5"/></svg>`,
+inboxFilled:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12 7 5h10l4 7v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" opacity=".28"/><path d="M3 12h5.3l1.2 2.6h4.9L15.6 12H21v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`,
+profile:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20.5c1.2-4.3 4.2-6.5 8-6.5s6.8 2.2 8 6.5"/></svg>`,
+profileFilled:`<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7.6" r="4.3"/><path d="M3.3 20.8C4.6 16 7.8 13.5 12 13.5s7.4 2.5 8.7 7.3z"/></svg>`,
+plus:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
+heart:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-10-9.3C.5 8 2 4.5 5.6 4c2.2-.3 4.2.9 6.4 3.4C14.2 4.9 16.2 3.7 18.4 4c3.6.5 5.1 4 3.6 7.2-2.5 4.7-10 9.3-10 9.3z"/></svg>`,
+heartFilled:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.5s-7.5-4.6-10-9.3C.5 8 2 4.5 5.6 4c2.2-.3 4.2.9 6.4 3.4C14.2 4.9 16.2 3.7 18.4 4c3.6.5 5.1 4 3.6 7.2-2.5 4.7-10 9.3-10 9.3z"/></svg>`,
+comment:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 20l1.2-5.2A8.5 8.5 0 1 1 21 11.5Z"/></svg>`,
+share:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>`,
+bookmark:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg>`,
+bookmarkFilled:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg>`,
+search:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>`,
+send:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg>`,
+back:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`,
+film:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>`,
+cam:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`,
+play:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,
+follow:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="4"/><path d="M2 20c.8-3.8 3.5-5.8 8-5.8" /><path d="M18 8v6M15 11h6"/></svg>`,
+bell:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>`,
+gear:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>`,
+crown:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8.2l4.2 3 4.8-6.4 4.8 6.4 4.2-3-2.1 10.8H5.1L3 8.2z"/></svg>`
+};
 
-  function playCheerSound() {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
+/* ===================== DATA ===================== */
+const AV_COLORS = ["#8b5cf6","#ec4899","#22d3ee","#f97316","#22c55e","#eab308","#ef4444","#6366f1"];
+function initials(name){ return name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase(); }
+function fmt(n){ if(n>=1000000) return (n/1000000).toFixed(1)+"M"; if(n>=1000) return (n/1000).toFixed(1)+"K"; return ""+n; }
 
-      const duration = 2.5;
-      const bufferSize = ctx.sampleRate * duration;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
+const state = {
+  activeTab: "home",
+  feedFilter: "foryou",
+  posts: [],
+  friends: [],
+  notifications: [],
+  conversations: [],
+  profile: { name:"Yusuf", user:"@yusuf.glowo", bio:"Glowo'ya hoş geldiniz ✨\\nİçerik üretmeye buradan başladım", color:"#8b5cf6", following:184, followers:2350, likes:18900, ptab:"videos", isFounder:false, birthdate:"" },
+  settings: { theme:"dark", notifLikes:true, notifComments:true, notifFollows:true, notifMessages:true, privateAccount:false, allowComments:true, dmPermission:"everyone", language:"tr", dataSaver:false, autoplay:true }
+};
 
-      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        let white = Math.random() * 2 - 1;
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-        data[i] *= 0.11;
-        b6 = white * 0.115926;
-      }
-
-      const noise = ctx.createBufferSource();
-      noise.buffer = buffer;
-
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 800;
-      filter.Q.value = 1.2;
-
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.01, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.8, ctx.currentTime + 0.3);
-      gain.gain.linearRampToValueAtTime(0.6, ctx.currentTime + 1.5);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-
-      noise.connect(filter);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-
-      const osc = ctx.createOscillator();
-      const oscGain = ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.4);
-      oscGain.gain.setValueAtTime(0.15, ctx.currentTime);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
-
-      osc.connect(oscGain);
-      oscGain.connect(ctx.destination);
-
-      noise.start();
-      osc.start();
-      osc.stop(ctx.currentTime + 0.8);
-      
-    } catch(e) {
-      console.log("Ses yürütülemedi:", e);
-    }
-  }
-
-  // ---------------- DATA ----------------
-  const GOLDEN = [
-    {name:"Cristiano Ronaldo", club:"Al-Nassr", country:"Portekiz", pos:"Forvet", num:"7", age:"40", extra:"5 kez Ballon d'Or ödülü kazandı"},
-    {name:"Lionel Messi", club:"Inter Miami", country:"Arjantin", pos:"Forvet", num:"10", age:"38", extra:"2022 Dünya Kupası'nı kaldırdı"},
-    {name:"Erling Haaland", club:"Manchester City", country:"Norveç", pos:"Forvet", num:"9", age:"25", extra:"Bir Premier Lig sezonunda gol rekoru kırdı"},
-    {name:"Pedri", club:"Barcelona", country:"İspanya", pos:"Orta Saha", num:"8", age:"23", extra:"Genç yaşta Barcelona'nın kilit ismi oldu"},
-    {name:"Rodri", club:"Manchester City", country:"İspanya", pos:"Orta Saha", num:"16", age:"29", extra:"2024 Ballon d'Or ödülünü kazandı"},
-    {name:"Mohamed Salah", club:"Liverpool", country:"Mısır", pos:"Kanat", num:"11", age:"33", extra:"Liverpool tarihinin en golcü oyuncularından"},
-    {name:"Zinedine Zidane", club:"Efsane (Emekli)", country:"Fransa", pos:"Orta Saha", num:"10", age:"52", extra:"1998 Dünya Kupası şampiyonu ve efsane 5 numaralı Madrid oyuncusu"},
-    {name:"Ronaldinho", club:"Efsane (Emekli)", country:"Brezilya", pos:"Forvet", num:"10", age:"45", extra:"Joga Bonito akımının öncüsü ve Ballon d'Or sahibi"},
-    {name:"Neymar Jr", club:"Santos", country:"Brezilya", pos:"Forvet", num:"10", age:"33", extra:"Tarihin en pahalı transfer rekoruna sahip"},
-    {name:"Kylian Mbappe", club:"Real Madrid", country:"Fransa", pos:"Forvet", num:"9", age:"27", extra:"2018 Dünya Kupası şampiyonu ve Dünya Kupası finalinde hat-trick yaptı"},
-    {name:"Victor Osimhen", club:"Galatasaray", country:"Nijerya", pos:"Forvet", num:"45", age:"27", extra:"Maskeli golcü, Napoli'ye yıllar sonra Serie A şampiyonluğu getirdi"},
-    {name:"Lamine Yamal", club:"Barcelona", country:"İspanya", pos:"Kanat", num:"19", age:"18", extra:"EURO 2024'ün en genç oyuncusu ve turnuvanın en iyi genç yeteneği seçildi"},
-    {name:"Vinicius Junior", club:"Real Madrid", country:"Brezilya", pos:"Kanat", num:"7", age:"25", extra:"Real Madrid ile Şampiyonlar Ligi finallerinde kritik goller attı"}
-  ].map(p=>({...p, golden:true}));
-
-  const NORMAL = [
-    {name:"Jude Bellingham", club:"Real Madrid", country:"İngiltere", pos:"Orta Saha", num:"5", age:"22"},
-    {name:"Kevin De Bruyne", club:"Napoli", country:"Belçika", pos:"Orta Saha", num:"17", age:"34"},
-    {name:"Harry Kane", club:"Bayern Münih", country:"İngiltere", pos:"Forvet", num:"9", age:"32"},
-    {name:"Bukayo Saka", club:"Arsenal", country:"İngiltere", pos:"Kanat", num:"7", age:"24"},
-    {name:"Phil Foden", club:"Manchester City", country:"İngiltere", pos:"Orta Saha", num:"47", age:"25"},
-    {name:"Declan Rice", club:"Arsenal", country:"İngiltere", pos:"Orta Saha", num:"41", age:"27"},
-    {name:"Luka Modric", club:"Milan", country:"Hırvatistan", pos:"Orta Saha", num:"10", age:"40"},
-    {name:"Robert Lewandowski", club:"Barcelona", country:"Polonya", pos:"Forvet", num:"9", age:"37"},
-    {name:"Antoine Griezmann", club:"Atletico Madrid", country:"Fransa", pos:"Forvet", num:"7", age:"34"},
-    {name:"Casemiro", club:"Manchester United", country:"Brezilya", pos:"Orta Saha", num:"18", age:"33"},
-    {name:"Thibaut Courtois", club:"Real Madrid", country:"Belçika", pos:"Kaleci", num:"1", age:"33"},
-    {name:"Virgil van Dijk", club:"Liverpool", country:"Hollanda", pos:"Defans", num:"4", age:"34"},
-    {name:"Bruno Fernandes", club:"Manchester United", country:"Portekiz", pos:"Orta Saha", num:"8", age:"31"},
-    {name:"Marcus Rashford", club:"Barcelona", country:"İngiltere", pos:"Forvet", num:"14", age:"27"},
-    {name:"Federico Valverde", club:"Real Madrid", country:"Uruguay", pos:"Orta Saha", num:"15", age:"27"},
-    {name:"Jamal Musiala", club:"Bayern Münih", country:"Almanya", pos:"Orta Saha", num:"42", age:"22"},
-    {name:"Florian Wirtz", club:"Liverpool", country:"Almanya", pos:"Orta Saha", num:"7", age:"23"},
-    {name:"Achraf Hakimi", club:"Paris Saint-Germain", country:"Fas", pos:"Defans", num:"2", age:"26"},
-    {name:"Joshua Kimmich", club:"Bayern Münih", country:"Almanya", pos:"Defans", num:"6", age:"30"},
-    {name:"Arda Güler", club:"Real Madrid", country:"Türkiye", pos:"Orta Saha", num:"15", age:"21"},
-    {name:"Hakan Çalhanoğlu", club:"Inter", country:"Türkiye", pos:"Orta Saha", num:"20", age:"32"},
-    {name:"Lautaro Martinez", club:"Inter", country:"Arjantin", pos:"Forvet", num:"10", age:"28"},
-    {name:"Son Heung-min", club:"Tottenham", country:"Güney Kore", pos:"Kanat", num:"7", age:"33"},
-    {name:"Alisson Becker", club:"Liverpool", country:"Brezilya", pos:"Kaleci", num:"1", age:"33"},
-    {name:"Ruben Dias", club:"Manchester City", country:"Portekiz", pos:"Defans", num:"3", age:"29"}
-  ].map(p=>({...p, extra:"Milli takımının önemli isimlerinden biri", golden:false}));
-
-  const SEGMENTS = [
-    {key:"club", label:"Kulüp", color:"#1a5c41"},
-    {key:"country", label:"Ülke", color:"#0f3d2e"},
-    {key:"pos", label:"Mevki", color:"#1a5c41"},
-    {key:"num", label:"Forma No", color:"#0f3d2e"},
-    {key:"age", label:"Yaş", color:"#1a5c41"},
-    {key:"extra", label:"Ekstra İpucu", color:"#0f3d2e"},
-  ];
-  const SCORE_TABLE = [1000, 850, 700, 550, 400, 250, 120]; 
-  const BASE_GOLDEN_CHANCE = 0.05;
-  const GOLDEN_BONUS = 500;
-
-  // PROMO CODES DATABASE
-  const PROMO_CODES = {
-    "2026FUT": 25000
+/* ===================== STORAGE (persists account across visits, falls back to memory if blocked) ===================== */
+const Storage = (function(){
+  let ok = false;
+  try{ const k="__glowo_test__"; localStorage.setItem(k,"1"); localStorage.removeItem(k); ok = true; }catch(e){ ok = false; }
+  const mem = {};
+  return {
+    get(k){ if(ok){ try{ return localStorage.getItem(k); }catch(e){} } return (k in mem) ? mem[k] : null; },
+    set(k,v){ if(ok){ try{ localStorage.setItem(k,v); return; }catch(e){} } mem[k]=v; },
+    remove(k){ if(ok){ try{ localStorage.removeItem(k); }catch(e){} } delete mem[k]; }
   };
-  let usedCodes = [];
-
-  // ---------------- STATE ----------------
-  let score = 0;
-  let luckLevel = 1; 
-  let current = null;
-  let revealed = {};
-  let revealedCount = 0;
-  let spinning = false;
-  let roundOver = false;
-  let wrongTries = 0;
-
-  // ---------------- DOM ----------------
-  const $ = id => document.getElementById(id);
-  const scorePill = $('scorePill');
-  const luckPill = $('luckPill');
-  const wheelInner = $('wheelInner');
-  const wheelSvg = $('wheelSvg');
-  const spinBtn = $('spinBtn');
-  const cluesPanel = $('cluesPanel');
-  const guessInput = $('guessInput');
-  const guessBtn = $('guessBtn');
-  const giveupBtn = $('giveupBtn');
-  const feedback = $('feedback');
-  const roundEnd = $('roundEnd');
-  const roundEndTitle = $('roundEndTitle');
-  const roundEndDesc = $('roundEndDesc');
-  const nextBtn = $('nextBtn');
-  const guessPanel = $('guessPanel');
-  const wheelZone = $('wheelZone');
-  const shopBtn = $('shopBtn');
-  const shopModal = $('shopModal');
-  const closeShop = $('closeShop');
-  const buy5x = $('buy5x');
-  const buy10x = $('buy10x');
-  const goalOverlay = $('goalOverlay');
-  const goalSubText = $('goalSubText');
-  const goalContinue = $('goalContinue');
-  const startOverlay = $('startOverlay');
-  const startBtn = $('startBtn');
-
-  const promoInput = $('promoInput');
-  const redeemBtn = $('redeemBtn');
-  const promoFeedback = $('promoFeedback');
-
-  // ---------------- WHEEL DRAW ----------------
-  let wheelRotation = 0;
-  function polar(cx, cy, r, angleDeg){
-    const a = (angleDeg - 90) * Math.PI / 180;
-    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
-  }
-  function drawWheel(){
-    const cx=150, cy=150, r=142;
-    const segAngle = 360/SEGMENTS.length;
-    let svg = "";
-    SEGMENTS.forEach((seg, i)=>{
-      const start = i*segAngle, end = (i+1)*segAngle;
-      const p1 = polar(cx,cy,r,start), p2 = polar(cx,cy,r,end);
-      const largeArc = segAngle > 180 ? 1 : 0;
-      const path = `M ${cx} ${cy} L ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)} Z`;
-      svg += `<path d="${path}" fill="${seg.color}" stroke="rgba(255,204,51,.25)" stroke-width="1.5"/>`;
-      const mid = start + segAngle/2;
-      const tp = polar(cx,cy,r*0.62,mid);
-      svg += `<text x="${tp.x.toFixed(2)}" y="${tp.y.toFixed(2)}" fill="#ffe98a" font-size="14" font-family="Bebas Neue, sans-serif" text-anchor="middle" transform="rotate(${mid} ${tp.x.toFixed(2)} ${tp.y.toFixed(2)})">${seg.label}</text>`;
-    });
-    wheelSvg.innerHTML = svg;
-  }
-  drawWheel();
-
-  // ---------------- CLUE CARDS ----------------
-  function renderClueCards(){
-    cluesPanel.innerHTML = "";
-    SEGMENTS.forEach(seg=>{
-      const div = document.createElement('div');
-      div.className = 'clue-card';
-      div.id = 'clue-' + seg.key;
-      div.innerHTML = `<div class="clue-label">${seg.label}</div><div class="clue-value">???</div>`;
-      cluesPanel.appendChild(div);
-    });
-  }
-  renderClueCards();
-
-  function revealClue(key){
-    const card = $('clue-' + key);
-    card.querySelector('.clue-value').textContent = current[key];
-    card.classList.add('revealed');
-    revealed[key] = true;
-    revealedCount++;
-  }
-
-  // ---------------- GAME FLOW ----------------
-  function pickPlayer(){
-    const chance = Math.min(BASE_GOLDEN_CHANCE * luckLevel, 0.9);
-    if (Math.random() < chance){
-      return { ...GOLDEN[Math.floor(Math.random()*GOLDEN.length)] };
-    }
-    return { ...NORMAL[Math.floor(Math.random()*NORMAL.length)] };
-  }
-
-  function startRound(){
-    current = pickPlayer();
-    revealed = {};
-    revealedCount = 0;
-    roundOver = false;
-    wrongTries = 0;
-    renderClueCards();
-    feedback.textContent = "";
-    feedback.className = "";
-    guessInput.value = "";
-    roundEnd.style.display = "none";
-    guessPanel.classList.remove('hidden');
-    wheelZone.classList.remove('hidden');
-    spinBtn.disabled = false;
-    spinBtn.textContent = "ÇARKI ÇEVİR";
-    guessInput.focus({preventScroll:true});
-  }
-
-  function unrevealedKeys(){
-    return SEGMENTS.map(s=>s.key).filter(k=>!revealed[k]);
-  }
-
-  function spinWheel(){
-    if (spinning || roundOver) return;
-    const remaining = unrevealedKeys();
-    if (remaining.length === 0) return;
-    spinning = true;
-    spinBtn.disabled = true;
-
-    playSpinSound();
-
-    const targetKey = remaining[Math.floor(Math.random()*remaining.length)];
-    const idx = SEGMENTS.findIndex(s=>s.key === targetKey);
-    const segAngle = 360 / SEGMENTS.length;
-    const targetAngle = 360 - (idx * segAngle + segAngle / 2);
-
-    const extraSpins = 4 * 360;
-    const currentModulo = wheelRotation % 360;
-    let distance = targetAngle - currentModulo;
-    if (distance <= 0) distance += 360;
-
-    wheelRotation += extraSpins + distance;
-    wheelInner.style.transform = `rotate(${wheelRotation}deg)`;
-
-    setTimeout(() => {
-      spinning = false;
-      revealClue(targetKey);
-      if (unrevealedKeys().length > 0) {
-        spinBtn.disabled = false;
-      } else {
-        spinBtn.textContent = "TÜM İPUÇLARI AÇILDI";
-      }
-    }, 3400);
-  }
-
-  function triggerGoalOverlay(earnedPoints) {
-    playCheerSound();
-    goalSubText.textContent = `${current.name.toUpperCase()} TAHMİN EDİLDİ! +${earnedPoints} PUAN`;
-    goalOverlay.classList.remove('hidden');
-
-    for (let i = 0; i < 45; i++) {
-      const c = document.createElement('div');
-      c.className = 'confetti';
-      c.style.left = Math.random() * 100 + 'vw';
-      c.style.backgroundColor = ['#ffcc33', '#3ddc84', '#ffffff', '#ffe98a'][Math.floor(Math.random()*4)];
-      c.style.animationDuration = (1.8 + Math.random() * 2) + 's';
-      goalOverlay.appendChild(c);
-      setTimeout(() => c.remove(), 4000);
-    }
-  }
-
-  function checkGuess() {
-    if (roundOver) return;
-    const val = guessInput.value.trim().toLowerCase();
-    if (!val) return;
-
-    const target = current.name.toLowerCase();
-    if (val === target || target.includes(val) && val.length > 3) {
-      roundOver = true;
-      let pts = SCORE_TABLE[revealedCount] || 100;
-      if (current.golden) pts += GOLDEN_BONUS;
-
-      score += pts;
-      scorePill.textContent = score.toLocaleString('tr-TR') + " PUAN";
-      scorePill.classList.add('bump');
-      setTimeout(() => scorePill.classList.remove('bump'), 400);
-
-      triggerGoalOverlay(pts);
-      endRound(true, pts);
-    } else {
-      wrongTries++;
-      guessInput.classList.add('shake');
-      feedback.textContent = "Yanlış tahmin! Tekrar dene.";
-      feedback.className = "bad";
-      setTimeout(() => guessInput.classList.remove('shake'), 400);
-    }
-  }
-
-  function giveUp() {
-    if (roundOver) return;
-    roundOver = true;
-    endRound(false, 0);
-  }
-
-  function endRound(win, pts) {
-    SEGMENTS.forEach(s => {
-      if (!revealed[s.key]) revealClue(s.key);
-    });
-
-    spinBtn.disabled = true;
-    guessPanel.classList.add('hidden');
-
-    roundEndTitle.textContent = win ? `TEBRİKLER! (+${pts} PUAN)` : "PES ETTİN!";
-    roundEndDesc.textContent = `Aranan futbolcu: ${current.name} (${current.club})`;
-    roundEnd.style.display = "block";
-  }
-
-  function updateShopUI() {
-    buy5x.disabled = score < 15000 || luckLevel >= 5;
-    buy10x.disabled = score < 50000 || luckLevel >= 10;
-    
-    if (luckLevel >= 5) buy5x.textContent = "ALINDI";
-    if (luckLevel >= 10) buy10x.textContent = "ALINDI";
-  }
-
-  function redeemCode() {
-    const raw = promoInput.value.trim().toUpperCase();
-    if (!raw) return;
-
-    if (usedCodes.includes(raw)) {
-      promoFeedback.style.color = "var(--red)";
-      promoFeedback.textContent = "Bu kod zaten kullanıldı!";
-      return;
-    }
-
-    if (PROMO_CODES[raw]) {
-      const bonus = PROMO_CODES[raw];
-      score += bonus;
-      usedCodes.push(raw);
-      scorePill.textContent = score.toLocaleString('tr-TR') + " PUAN";
-      scorePill.classList.add('bump');
-      setTimeout(() => scorePill.classList.remove('bump'), 400);
-
-      promoFeedback.style.color = "var(--green-ok)";
-      promoFeedback.textContent = `Tebrikler! +${bonus.toLocaleString('tr-TR')} Puan eklendi!`;
-      promoInput.value = "";
-      updateShopUI();
-    } else {
-      promoFeedback.style.color = "var(--red)";
-      promoFeedback.textContent = "Geçersiz veya süresi dolmuş kod!";
-    }
-  }
-
-  // ---------------- LISTENERS ----------------
-  spinBtn.addEventListener('click', spinWheel);
-  guessBtn.addEventListener('click', checkGuess);
-  giveupBtn.addEventListener('click', giveUp);
-
-  guessInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') checkGuess();
-  });
-
-  nextBtn.addEventListener('click', startRound);
-
-  goalContinue.addEventListener('click', () => {
-    goalOverlay.classList.add('hidden');
-  });
-
-  startBtn.addEventListener('click', () => {
-    startOverlay.classList.add('fade-out');
-    setTimeout(() => {
-      startOverlay.style.display = 'none';
-      startRound();
-    }, 500);
-  });
-
-  // Shop Listeners
-  shopBtn.addEventListener('click', () => {
-    updateShopUI();
-    promoFeedback.textContent = "";
-    shopModal.classList.remove('hidden');
-  });
-
-  closeShop.addEventListener('click', () => {
-    shopModal.classList.add('hidden');
-  });
-
-  redeemBtn.addEventListener('click', redeemCode);
-  promoInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') redeemCode();
-  });
-
-  buy5x.addEventListener('click', () => {
-    if (score >= 15000 && luckLevel < 5) {
-      score -= 15000;
-      luckLevel = 5;
-      scorePill.textContent = score.toLocaleString('tr-TR') + " PUAN";
-      luckPill.textContent = "Şans: 5X";
-      luckPill.classList.add('active');
-      updateShopUI();
-    }
-  });
-
-  buy10x.addEventListener('click', () => {
-    if (score >= 50000 && luckLevel < 10) {
-      score -= 50000;
-      luckLevel = 10;
-      scorePill.textContent = score.toLocaleString('tr-TR') + " PUAN";
-      luckPill.textContent = "Şans: 10X";
-      luckPill.classList.add('active');
-      updateShopUI();
-    }
-  });
-
 })();
+function persistAccount(){
+  Storage.set("glowo_profile", JSON.stringify(state.profile));
+  Storage.set("glowo_settings", JSON.stringify(state.settings));
+}
+function changeFollowingCount(delta){
+  state.profile.following = Math.max(0, (state.profile.following||0) + delta);
+  persistAccount();
+  const stat = document.querySelector(".pstats div:nth-child(1) b");
+  if(stat) stat.textContent = state.profile.following;
+}
+/* Accounts created on this device/browser, so people who set up Glowo on the
+   same phone can find & follow each other in the Friends tab (no server needed). */
+function getKnownAccounts(){
+  try{ return JSON.parse(Storage.get("glowo_known_accounts") || "[]"); }catch(e){ return []; }
+}
+function registerKnownAccount(profile){
+  const known = getKnownAccounts();
+  const idx = known.findIndex(a=>a.user===profile.user);
+  const entry = {name:profile.name, user:profile.user, color:profile.color, isFounder:!!profile.isFounder};
+  if(idx===-1) known.push(entry); else known[idx] = entry;
+  Storage.set("glowo_known_accounts", JSON.stringify(known));
+}
+function getFollowedAccounts(){
+  try{ return JSON.parse(Storage.get("glowo_followed_accounts") || "{}"); }catch(e){ return {}; }
+}
+function setFollowedAccounts(obj){ Storage.set("glowo_followed_accounts", JSON.stringify(obj)); }
+function calcAge(dateStr){
+  if(!dateStr) return null;
+  const b = new Date(dateStr);
+  if(isNaN(b.getTime())) return null;
+  const t = new Date();
+  let age = t.getFullYear() - b.getFullYear();
+  const m = t.getMonth() - b.getMonth();
+  if(m < 0 || (m===0 && t.getDate() < b.getDate())) age--;
+  return age;
+}
+
+/* ===================== HELPERS ===================== */
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function avatarCircle(size, colorOrGrad, text){
+  return `<div class="favatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.36)}px;background:${colorOrGrad}">${text}</div>`;
+}
+
+/* ===================== ICON INJECTION (static UI) ===================== */
+document.getElementById("searchBtn").innerHTML = ICONS.search;
+document.querySelector('[data-tab="home"]').innerHTML = ICONS.homeFilled + "<span>Ana Sayfa</span>";
+document.querySelector('[data-tab="friends"]').innerHTML = ICONS.friends + "<span>Arkadaşlar</span>";
+document.querySelector('[data-tab="inbox"]').innerHTML = `<span class="nav-icon-wrap">${ICONS.inbox}<span class="badge-dot" id="inboxDot"></span></span><span>Gelen Kutusu</span>`;
+document.querySelector('[data-tab="profile"]').innerHTML = ICONS.profile + "<span>Profil</span>";
+document.getElementById("plusBtn").innerHTML = ICONS.plus;
+document.getElementById("closeComments").innerHTML = "✕";
+document.getElementById("sendComment").innerHTML = ICONS.send;
+document.getElementById("chatBack").innerHTML = ICONS.back;
+document.getElementById("chatSend").innerHTML = ICONS.send;
+document.getElementById("pickFileOpt").querySelector(".oicon").innerHTML = ICONS.film;
+document.querySelector(".upload-opt.odim .oicon").innerHTML = ICONS.cam;
+document.getElementById("settingsBtn").innerHTML = ICONS.gear;
+document.getElementById("settingsBack").innerHTML = ICONS.back;
+
+/* ===================== HOME / FEED ===================== */
+const feedEl = document.getElementById("feed");
+
+function postNode(p){
+  const el = document.createElement("div");
+  el.className = "post";
+  el.dataset.id = p.id;
+  const isOwnPost = p.user === state.profile.user.replace("@","");
+  const mediaHtml = p.videoURL ? "" : `<div class="post-bg" style="background:${p.grad}"></div>`;
+  el.innerHTML = `
+    ${mediaHtml}
+    <div class="post-shade"></div>
+    <div class="post-body">
+      <div class="post-info">
+        <div class="uname">@${p.user}${p.founderPost?`<span class="founder-mini" title="Kurucu">${ICONS.crown}</span>`:""}${isOwnPost?"":`<span class="follow-chip ${p.following?'following':''}" data-act="follow">${p.following?'Takip Ediliyor':'Takip Et'}</span>`}</div>
+        <div class="caption">${p.caption} <span class="hashtags">${p.tags}</span></div>
+        <div class="music-row">${ICONS.play.replace('viewBox="0 0 24 24"','viewBox="0 0 24 24" width="14" height="14"')}<span class="marquee">${p.music} &nbsp;&nbsp;•&nbsp;&nbsp; ${p.music}</span></div>
+      </div>
+      <div class="actions">
+        <div class="avatar-wrap">
+          ${avatarCircle(46, p.grad, initials(p.user))}
+          ${isOwnPost?"":`<div class="plus-badge" data-act="follow">+</div>`}
+        </div>
+        <button class="act-btn ${p.liked?'liked':''}" data-act="like">${p.liked?ICONS.heartFilled:ICONS.heart}<span data-role="likecount">${fmt(p.likes)}</span></button>
+        <button class="act-btn" data-act="comment">${ICONS.comment}<span>${p.comments.length}</span></button>
+        <button class="act-btn ${p.saved?'saved':''}" data-act="save">${p.saved?ICONS.bookmarkFilled:ICONS.bookmark}<span>Kaydet</span></button>
+        <button class="act-btn" data-act="share">${ICONS.share}<span>${fmt(p.shares)}</span></button>
+        <div class="disc"></div>
+      </div>
+    </div>
+  `;
+  if(p.videoURL){
+    const vid = document.createElement("video");
+    vid.loop = true;
+    vid.muted = true;
+    vid.defaultMuted = true;
+    vid.playsInline = true;
+    vid.setAttribute("muted","");
+    vid.setAttribute("playsinline","");
+    vid.setAttribute("webkit-playsinline","");
+    vid.preload = "auto";
+    const spinner = document.createElement("div");
+    spinner.className = "vid-spinner";
+    const hideSpinner = ()=>{ if(spinner.parentNode) spinner.remove(); };
+    vid.addEventListener("loadeddata", hideSpinner);
+    vid.addEventListener("canplay", hideSpinner);
+    vid.addEventListener("playing", hideSpinner);
+    vid.addEventListener("error", ()=>{
+      hideSpinner();
+      if(el.querySelector(".vid-error")) return;
+      const err = document.createElement("div");
+      err.className = "vid-error";
+      err.style.whiteSpace = "normal";
+      err.style.maxWidth = "80%";
+      err.style.textAlign = "center";
+      err.style.lineHeight = "1.4";
+      err.textContent = "Bu video oynatılamıyor. Telefon videoları genelde MP4 (H.264) olmalı — HEVC/MOV formatı bazı tarayıcılarda açılmayabilir.";
+      el.appendChild(err);
+    });
+    vid.addEventListener("click", ()=>{
+      if(vid.paused){ vid.play().catch(()=>{}); } else { vid.pause(); }
+    });
+    el.insertBefore(vid, el.firstChild);
+    el.appendChild(spinner);
+    vid.src = p.videoURL;
+    vid.load();
+  }
+  return el;
+}
+
+function renderFeed(){
+  feedEl.innerHTML = "";
+  const list = state.posts.filter(p => state.feedFilter === "foryou" || p.following);
+  if(list.length===0){
+    const msg = state.posts.length===0
+      ? "Henüz hiç video yok. İlk videoyu sen paylaş! 🎬"
+      : "Takip ettiğin kimse henüz video paylaşmadı. \"Öneriler\" sekmesine göz at!";
+    feedEl.innerHTML = `<div class="empty-hint">${msg}</div>`;
+    return;
+  }
+  list.forEach(p=> feedEl.appendChild(postNode(p)));
+  setupVideoObserver();
+}
+
+let observer;
+function setupVideoObserver(){
+  if(observer) observer.disconnect();
+  observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      const v = e.target.querySelector("video");
+      if(!v) return;
+      if(e.isIntersecting){
+        const p = v.play();
+        if(p && p.catch) p.catch(()=>{
+          v.addEventListener("canplay", ()=> v.play().catch(()=>{}), {once:true});
+        });
+      } else {
+        v.pause();
+      }
+    });
+  }, {threshold:0.6});
+  feedEl.querySelectorAll(".post").forEach(p=>observer.observe(p));
+}
+
+function findPost(id){ return state.posts.find(p=>p.id===Number(id)); }
+
+feedEl.addEventListener("click",(e)=>{
+  const btn = e.target.closest("[data-act]");
+  if(!btn) return;
+  const postEl = e.target.closest(".post");
+  const p = findPost(postEl.dataset.id);
+  const act = btn.dataset.act;
+  if(act==="like"){
+    p.liked = !p.liked; p.likes += p.liked?1:-1;
+    btn.classList.toggle("liked", p.liked);
+    btn.innerHTML = (p.liked?ICONS.heartFilled:ICONS.heart) + `<span data-role="likecount">${fmt(p.likes)}</span>`;
+  } else if(act==="save"){
+    p.saved = !p.saved;
+    btn.classList.toggle("saved", p.saved);
+    btn.innerHTML = (p.saved?ICONS.bookmarkFilled:ICONS.bookmark) + `<span>Kaydet</span>`;
+    if(p.saved) toast("Kaydedildi");
+  } else if(act==="share"){
+    p.shares += 1;
+    toast("Bağlantı kopyalandı");
+  } else if(act==="follow"){
+    p.following = !p.following;
+    postEl.querySelectorAll('[data-act="follow"]').forEach(elx=>{
+      if(elx.classList.contains("follow-chip")){
+        elx.classList.toggle("following", p.following);
+        elx.textContent = p.following ? "Takip Ediliyor" : "Takip Et";
+      }
+    });
+    changeFollowingCount(p.following ? 1 : -1);
+    toast(p.following ? `@${p.user} takip ediliyor` : `@${p.user} takipten çıkıldı`);
+  } else if(act==="comment"){
+    openComments(p.id);
+  }
+});
+
+document.querySelectorAll(".feed-toggle button").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    document.querySelectorAll(".feed-toggle button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    state.feedFilter = b.dataset.filter;
+    renderFeed();
+  });
+});
+
+/* ===================== COMMENTS ===================== */
+let activeCommentPostId = null;
+function openComments(id){
+  activeCommentPostId = id;
+  const p = findPost(id);
+  document.getElementById("commentCount").textContent = `${p.comments.length} yorum`;
+  renderComments();
+  document.getElementById("overlay").classList.add("show");
+  document.getElementById("commentSheet").classList.add("show");
+}
+function renderComments(){
+  const p = findPost(activeCommentPostId);
+  const list = document.getElementById("commentsList");
+  list.innerHTML = p.comments.map(c=>`
+    <div class="comment-item">
+      ${avatarCircle(32, AV_COLORS[c.u.length % AV_COLORS.length], initials(c.u))}
+      <div class="cbody"><div class="cuser">@${c.u}</div><div class="ctext">${c.t}</div></div>
+    </div>`).join("");
+}
+function closeComments(){
+  document.getElementById("overlay").classList.remove("show");
+  document.getElementById("commentSheet").classList.remove("show");
+}
+document.getElementById("overlay").addEventListener("click", closeComments);
+document.getElementById("closeComments").addEventListener("click", closeComments);
+document.getElementById("sendComment").addEventListener("click", submitComment);
+document.getElementById("commentInput").addEventListener("keydown", e=>{ if(e.key==="Enter") submitComment(); });
+function submitComment(){
+  const input = document.getElementById("commentInput");
+  const val = input.value.trim();
+  if(!val) return;
+  const p = findPost(activeCommentPostId);
+  p.comments.push({u: state.profile.user.replace("@",""), t: val});
+  input.value = "";
+  renderComments();
+  document.getElementById("commentCount").textContent = `${p.comments.length} yorum`;
+  const postEl = feedEl.querySelector(`.post[data-id="${p.id}"]`);
+  if(postEl) postEl.querySelector('[data-act="comment"] span').textContent = p.comments.length;
+}
+
+/* ===================== NAV / TABS ===================== */
+document.querySelectorAll(".nav-btn[data-tab]").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const tab = btn.dataset.tab;
+    state.activeTab = tab;
+    document.querySelectorAll(".nav-btn[data-tab]").forEach(b=>{
+      b.classList.remove("active");
+      const t = b.dataset.tab;
+      const filled = {home:ICONS.homeFilled, friends:ICONS.friendsFilled, inbox:ICONS.inboxFilled, profile:ICONS.profileFilled};
+      const line = {home:ICONS.home, friends:ICONS.friends, inbox:ICONS.inbox, profile:ICONS.profile};
+      const active = t===tab;
+      if(active) b.classList.add("active");
+      if(t==="inbox"){
+        b.innerHTML = `<span class="nav-icon-wrap">${active?filled.inbox:line.inbox}<span class="badge-dot" id="inboxDot" style="${state.notifications.length===0?'display:none':''}"></span></span><span>Gelen Kutusu</span>`;
+      } else {
+        b.innerHTML = (active?filled[t]:line[t]) + `<span>${ {home:"Ana Sayfa",friends:"Arkadaşlar",profile:"Profil"}[t] }</span>`;
+      }
+    });
+    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+    document.getElementById("tab-"+tab).classList.add("active");
+    document.getElementById("topbar").style.display = tab==="home" ? "flex" : "none";
+    if(tab==="friends") renderFriends();
+    if(tab==="inbox") renderInbox();
+    if(tab==="profile") renderProfile();
+  });
+});
+
+/* ===================== FRIENDS ===================== */
+function renderFriends(){
+  const el = document.getElementById("friendsScroll");
+  const known = getKnownAccounts().filter(a => a.user !== state.profile.user);
+  if(known.length===0){
+    el.innerHTML = `<div style="padding:70px 30px; text-align:center; color:var(--text-faint); font-size:14px; line-height:1.5;">Henüz kimse yok. Ailenden ya da arkadaşlarından biri bu cihazda kendi Glowo hesabını oluşturunca burada görünecek. 👥</div>`;
+    return;
+  }
+  const followed = getFollowedAccounts();
+  el.innerHTML = `<div class="section-label">Bu Cihazda Kayıtlı</div>` +
+    known.map(f=>`
+      <div class="friend-row">
+        ${avatarCircle(48, f.color, initials(f.name))}
+        <div class="friend-meta"><div class="fname">${f.name}${f.isFounder?` <span class="founder-mini" style="width:14px;height:14px;">${ICONS.crown}</span>`:""}</div><div class="fsub">${f.user} · Kişilerinde kayıtlı</div></div>
+        <button class="follow-btn ${followed[f.user]?'following':''}" data-user="${f.user}">${followed[f.user]?'Takip Ediliyor':'Takip Et'}</button>
+      </div>`).join("");
+  el.querySelectorAll(".follow-btn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const u = b.dataset.user;
+      const now = getFollowedAccounts();
+      now[u] = !now[u];
+      setFollowedAccounts(now);
+      b.classList.toggle("following", now[u]);
+      b.textContent = now[u] ? "Takip Ediliyor" : "Takip Et";
+      changeFollowingCount(now[u] ? 1 : -1);
+      toast(now[u] ? `${u} takip ediliyor` : `${u} takipten çıkıldı`);
+    });
+  });
+}
+
+/* ===================== INBOX ===================== */
+function renderInbox(){
+  const el = document.getElementById("inboxScroll");
+  if(state.notifications.length===0 && state.conversations.length===0){
+    el.innerHTML = `<div style="padding:70px 30px; text-align:center; color:var(--text-faint); font-size:14px; line-height:1.5;">Henüz bildirim ya da mesajın yok. Paylaşım yaptıkça burada görünecek. 🔔</div>`;
+    return;
+  }
+  el.innerHTML =
+    (state.notifications.length ? `<div class="section-label">Bildirimler</div>` +
+      state.notifications.map(n=>`
+        <div class="notif-row">
+          <div class="notif-icon">${ICONS[n.icon] || ICONS.bell}</div>
+          <div><div class="notif-text">${n.text}</div><div class="notif-time">${n.time}</div></div>
+        </div>`).join("") : "") +
+    (state.conversations.length ? `<div class="section-label">Mesajlar</div>` +
+      state.conversations.map((c,i)=>`
+        <div class="msg-row" data-i="${i}">
+          ${avatarCircle(48, c.color, initials(c.name))}
+          <div class="friend-meta"><div class="fname">${c.name}</div><div class="msg-preview">${c.last}</div></div>
+        </div>`).join("") : "");
+  el.querySelectorAll(".msg-row").forEach(r=>{
+    r.addEventListener("click", ()=> openChat(Number(r.dataset.i)));
+  });
+}
+
+let activeChatIndex = null;
+function openChat(i){
+  activeChatIndex = i;
+  const c = state.conversations[i];
+  document.getElementById("chatName").textContent = c.name;
+  document.getElementById("chatAvatar").style.background = c.color;
+  document.getElementById("chatAvatar").textContent = initials(c.name);
+  renderChatMessages();
+  document.getElementById("chatView").classList.add("show");
+}
+function renderChatMessages(){
+  const c = state.conversations[activeChatIndex];
+  document.getElementById("chatMessages").innerHTML = c.messages.map(m=>
+    `<div class="bubble ${m.me?'me':'them'}">${m.t}</div>`).join("");
+  const box = document.getElementById("chatMessages");
+  box.scrollTop = box.scrollHeight;
+}
+document.getElementById("chatBack").addEventListener("click", ()=> document.getElementById("chatView").classList.remove("show"));
+document.getElementById("chatSend").addEventListener("click", sendChatMsg);
+document.getElementById("chatInput").addEventListener("keydown", e=>{ if(e.key==="Enter") sendChatMsg(); });
+function sendChatMsg(){
+  const input = document.getElementById("chatInput");
+  const val = input.value.trim();
+  if(!val) return;
+  const c = state.conversations[activeChatIndex];
+  c.messages.push({me:true, t:val});
+  c.last = val;
+  input.value = "";
+  renderChatMessages();
+  setTimeout(()=>{
+    const replies = ["Harika! 😄","Kesinlikle katılıyorum","Ne zaman görüşelim?","Süper haber!","Anladım 👍"];
+    c.messages.push({me:false, t:replies[Math.floor(Math.random()*replies.length)]});
+    c.last = c.messages[c.messages.length-1].t;
+    if(activeChatIndex!==null) renderChatMessages();
+  }, 1200);
+}
+ICONS.follow = ICONS.follow; // keep for notif icon set
+ICONS["comment"] = ICONS.comment;
+
+/* ===================== PROFILE ===================== */
+function renderProfile(){
+  const pr = state.profile;
+  const el = document.getElementById("profileScroll");
+  const ownPosts = state.posts;
+  const likedPosts = state.posts.filter(p=>p.liked);
+  el.innerHTML = `
+    <div class="profile-top">
+      <div class="pavatar" style="background:${pr.color}">${initials(pr.name)}</div>
+      <div class="pname">${pr.name}</div>
+      <div class="puser">${pr.user}</div>
+      ${pr.isFounder ? `<div class="founder-badge">${ICONS.crown} KURUCU</div>` : ""}
+      <div class="pstats">
+        <div><b>${pr.following}</b><span>Takip</span></div>
+        <div><b>${fmt(pr.followers)}</b><span>Takipçi</span></div>
+        <div><b>${fmt(pr.likes)}</b><span>Beğeni</span></div>
+      </div>
+      <div class="pbio">${pr.bio.replace(/\\n/g,"<br>")}</div>
+      <div class="pbtn-row">
+        <button class="pbtn" id="editProfileBtn">Profili Düzenle</button>
+        <button class="pbtn" id="shareProfileBtn">Paylaş</button>
+      </div>
+    </div>
+    <div class="ptabs">
+      <div class="ptab ${pr.ptab==='videos'?'active':''}" data-t="videos"><span class="ptab-icon">${ICONS.film}</span> Videolarım</div>
+      <div class="ptab ${pr.ptab==='liked'?'active':''}" data-t="liked"><span class="ptab-icon">${ICONS.heart}</span> Beğenilenler</div>
+    </div>
+    <div class="pgrid" id="pgrid"></div>
+  `;
+  const grid = document.getElementById("pgrid");
+  const items = pr.ptab==="videos" ? ownPosts : likedPosts;
+  grid.innerHTML = items.length ? items.map(p=>`
+      <div class="cell" style="background:${p.grad}">
+        <div class="plays">${ICONS.play.replace('viewBox="0 0 24 24"','viewBox="0 0 24 24" width="12" height="12"')} ${fmt(p.likes)}</div>
+      </div>`).join("")
+    : `<div style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:30px 10px;font-size:13.5px;">Henüz video yok</div>`;
+
+  el.querySelectorAll(".ptab").forEach(t=>{
+    t.addEventListener("click", ()=>{ pr.ptab = t.dataset.t; renderProfile(); });
+  });
+  document.getElementById("editProfileBtn").addEventListener("click", openEditModal);
+  document.getElementById("shareProfileBtn").addEventListener("click", ()=> toast("Profil bağlantısı kopyalandı"));
+}
+
+/* edit profile modal */
+function openEditModal(){
+  document.getElementById("editName").value = state.profile.name;
+  document.getElementById("editUsername").value = state.profile.user.replace("@","");
+  document.getElementById("editBirthdate").value = state.profile.birthdate || "";
+  document.getElementById("editBio").value = state.profile.bio;
+  const row = document.getElementById("colorRow");
+  row.innerHTML = AV_COLORS.map(c=>`<div class="color-swatch ${c===state.profile.color?'sel':''}" data-c="${c}" style="background:${c}"></div>`).join("");
+  row.querySelectorAll(".color-swatch").forEach(s=>{
+    s.addEventListener("click", ()=>{
+      row.querySelectorAll(".color-swatch").forEach(x=>x.classList.remove("sel"));
+      s.classList.add("sel");
+    });
+  });
+  document.getElementById("editOverlay").classList.add("show");
+}
+document.getElementById("cancelEdit").addEventListener("click", ()=> document.getElementById("editOverlay").classList.remove("show"));
+document.getElementById("saveEdit").addEventListener("click", ()=>{
+  const oldUser = state.profile.user;
+  state.profile.name = document.getElementById("editName").value.trim() || state.profile.name;
+  const uname = document.getElementById("editUsername").value.trim().replace(/^@+/,"").replace(/\s+/g,"").toLowerCase();
+  if(uname) state.profile.user = "@"+uname;
+  const bd = document.getElementById("editBirthdate").value;
+  if(bd) state.profile.birthdate = bd;
+  state.profile.bio = document.getElementById("editBio").value.trim();
+  const sel = document.querySelector(".color-swatch.sel");
+  if(sel) state.profile.color = sel.dataset.c;
+  document.getElementById("editOverlay").classList.remove("show");
+  persistAccount();
+  if(oldUser !== state.profile.user){
+    const known = getKnownAccounts().filter(a=>a.user!==oldUser);
+    Storage.set("glowo_known_accounts", JSON.stringify(known));
+  }
+  registerKnownAccount(state.profile);
+  renderProfile();
+  toast("Profil güncellendi");
+});
+
+/* ===================== UPLOAD / CREATE ===================== */
+let pendingVideoURL = null;
+document.getElementById("plusBtn").addEventListener("click", ()=> document.getElementById("uploadOverlay").classList.add("show"));
+document.getElementById("cancelUpload").addEventListener("click", ()=> document.getElementById("uploadOverlay").classList.remove("show"));
+const UNSUPPORTED_MSG = "Bu video oynatılamadı. Telefon videoları genelde MP4 (H.264) olmalı — özellikle iPhone'da HEVC/MOV formatındaki videolar bazı tarayıcılarda/bilgisayarlarda açılmayabilir. iPhone'da Ayarlar > Kamera > Biçimler bölümünden \"En Uyumlu\"yu seçip tekrar dene, ya da videoyu MP4'e dönüştür.";
+document.getElementById("pickFileOpt").addEventListener("click", ()=> document.getElementById("fileInput").click());
+document.getElementById("fileInput").addEventListener("change", (e)=>{
+  const file = e.target.files[0];
+  e.target.value = "";
+  if(!file) return;
+  if(!file.type.startsWith("video/") && file.type !== ""){
+    toast("Lütfen bir video dosyası seç");
+    return;
+  }
+  pendingVideoURL = URL.createObjectURL(file);
+  document.getElementById("uploadOverlay").classList.remove("show");
+  const pv = document.getElementById("previewVideo");
+  const warn = document.getElementById("previewWarning");
+  warn.classList.remove("show");
+  warn.textContent = "";
+  pv.src = pendingVideoURL;
+  pv.load();
+  document.getElementById("captionInput").value = "";
+  document.getElementById("postOverlay").classList.add("show");
+});
+document.getElementById("previewVideo").addEventListener("error", ()=>{
+  const warn = document.getElementById("previewWarning");
+  warn.textContent = UNSUPPORTED_MSG;
+  warn.classList.add("show");
+});
+document.getElementById("cancelPost").addEventListener("click", ()=>{
+  document.getElementById("postOverlay").classList.remove("show");
+  document.getElementById("previewVideo").src = "";
+  document.getElementById("previewWarning").classList.remove("show");
+  if(pendingVideoURL){ URL.revokeObjectURL(pendingVideoURL); pendingVideoURL = null; }
+});
+document.getElementById("submitPost").addEventListener("click", ()=>{
+  const caption = document.getElementById("captionInput").value.trim() || "Yeni video 🎬";
+  const tagsMatch = caption.match(/#\\w+/g);
+  const newPost = {
+    id: Date.now(),
+    user: state.profile.user.replace("@",""),
+    avatar: state.profile.color,
+    grad: state.profile.color,
+    caption: caption.replace(/#\\w+/g,"").trim() || "Yeni video 🎬",
+    tags: tagsMatch ? tagsMatch.join(" ") : "#glowo",
+    music: "Orijinal Ses - " + state.profile.user.replace("@",""),
+    likes:0, shares:0, following:true, liked:false, saved:false, comments:[],
+    videoURL: pendingVideoURL,
+    founderPost: state.profile.isFounder
+  };
+  state.posts.unshift(newPost);
+  document.getElementById("postOverlay").classList.remove("show");
+  document.getElementById("previewVideo").src = "";
+  pendingVideoURL = null;
+  document.querySelectorAll(".nav-btn[data-tab]")[0].click();
+  renderFeed();
+  feedEl.scrollTop = 0;
+  toast("Videon paylaşıldı! ✨");
+});
+
+/* ===================== SETTINGS ===================== */
+function toggleRow(key, label, sub){
+  const checked = state.settings[key] ? "checked" : "";
+  return `<div class="settings-row">
+    <div><div class="srow-label">${label}</div>${sub?`<div class="srow-sub">${sub}</div>`:""}</div>
+    <label class="switch"><input type="checkbox" data-key="${key}" ${checked}><span class="slider"></span></label>
+  </div>`;
+}
+function renderSettings(){
+  const s = state.settings;
+  const el = document.getElementById("settingsScroll");
+  el.innerHTML = `
+    <div class="section-label">Hesap</div>
+    <div class="settings-row clickable" id="setEditProfile">
+      <div><div class="srow-label">Profili Düzenle</div><div class="srow-sub">Ad, kullanıcı adı, biyografi, doğum tarihi</div></div>
+    </div>
+    <div class="section-label">Gizlilik</div>
+    ${toggleRow("privateAccount","Gizli Hesap","Sadece onayladığın kişiler videolarını görebilir")}
+    ${toggleRow("allowComments","Yorumlara İzin Ver","Herkes videolarına yorum yapabilir")}
+    <div class="settings-row">
+      <div><div class="srow-label">Mesaj İzni</div><div class="srow-sub">Kimler sana mesaj gönderebilir</div></div>
+      <select id="setDm">
+        <option value="everyone" ${s.dmPermission==="everyone"?"selected":""}>Herkes</option>
+        <option value="following" ${s.dmPermission==="following"?"selected":""}>Takip Ettiklerim</option>
+        <option value="none" ${s.dmPermission==="none"?"selected":""}>Kimse</option>
+      </select>
+    </div>
+    <div class="section-label">Bildirimler</div>
+    ${toggleRow("notifLikes","Beğeniler","")}
+    ${toggleRow("notifComments","Yorumlar","")}
+    ${toggleRow("notifFollows","Yeni Takipçiler","")}
+    ${toggleRow("notifMessages","Mesajlar","")}
+    <div class="section-label">Görünüm</div>
+    <div class="settings-row">
+      <div><div class="srow-label">Tema</div><div class="srow-sub">Koyu veya açık görünüm</div></div>
+      <select id="setTheme">
+        <option value="dark" ${s.theme==="dark"?"selected":""}>Koyu</option>
+        <option value="light" ${s.theme==="light"?"selected":""}>Açık</option>
+      </select>
+    </div>
+    <div class="section-label">Oynatma</div>
+    ${toggleRow("autoplay","Otomatik Oynat","Akışta videolar otomatik başlasın")}
+    ${toggleRow("dataSaver","Veri Tasarrufu","Videoları düşük kalitede yükle")}
+    <div class="settings-row">
+      <div><div class="srow-label">Dil</div></div>
+      <select id="setLang">
+        <option value="tr" ${s.language==="tr"?"selected":""}>Türkçe</option>
+        <option value="en" ${s.language==="en"?"selected":""}>English</option>
+      </select>
+    </div>
+    <div class="section-label">Diğer</div>
+    <div class="settings-row clickable" id="setHelp"><div class="srow-label">Yardım ve Destek</div></div>
+    <div class="settings-row"><div><div class="srow-label">Glowo Hakkında</div><div class="srow-sub">Sürüm 1.0.0</div></div></div>
+    <div class="settings-row clickable" id="setLogout"><div class="srow-label">Çıkış Yap</div></div>
+    <div class="settings-row clickable danger" id="setDelete"><div class="srow-label">Hesabı Sil</div></div>
+  `;
+  document.getElementById("setEditProfile").addEventListener("click", ()=>{ closeSettings(); openEditModal(); });
+  document.getElementById("setHelp").addEventListener("click", ()=> toast("Destek: destek@glowo.app"));
+  el.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb=>{
+    cb.addEventListener("change", ()=>{
+      state.settings[cb.dataset.key] = cb.checked;
+      persistAccount();
+      toast("Kaydedildi");
+    });
+  });
+  document.getElementById("setDm").addEventListener("change", (e)=>{ state.settings.dmPermission = e.target.value; persistAccount(); toast("Kaydedildi"); });
+  document.getElementById("setTheme").addEventListener("change", (e)=>{ state.settings.theme = e.target.value; applyTheme(); persistAccount(); });
+  document.getElementById("setLang").addEventListener("change", (e)=>{ state.settings.language = e.target.value; persistAccount(); toast("Dil tercihi kaydedildi"); });
+  document.getElementById("setLogout").addEventListener("click", ()=> confirmAction("Çıkış Yap", "Hesabından çıkış yapmak istediğine emin misin? Tekrar girmek için hesap oluşturman gerekecek.", doLogout));
+  document.getElementById("setDelete").addEventListener("click", ()=> confirmAction("Hesabı Sil", "Bu işlem geri alınamaz. Tüm profil bilgilerin bu cihazdan silinecek.", doDeleteAccount));
+}
+document.getElementById("settingsBtn").addEventListener("click", ()=>{ renderSettings(); document.getElementById("settingsView").classList.add("show"); });
+document.getElementById("settingsBack").addEventListener("click", closeSettings);
+function closeSettings(){ document.getElementById("settingsView").classList.remove("show"); }
+
+let confirmCallback = null;
+function confirmAction(title, text, cb){
+  document.getElementById("confirmTitle").textContent = title;
+  document.getElementById("confirmText").textContent = text;
+  confirmCallback = cb;
+  document.getElementById("confirmOverlay").classList.add("show");
+}
+document.getElementById("confirmCancel").addEventListener("click", ()=>{
+  document.getElementById("confirmOverlay").classList.remove("show");
+  confirmCallback = null;
+});
+document.getElementById("confirmOk").addEventListener("click", ()=>{
+  document.getElementById("confirmOverlay").classList.remove("show");
+  if(confirmCallback) confirmCallback();
+  confirmCallback = null;
+});
+function doLogout(){
+  Storage.remove("glowo_profile");
+  location.reload();
+}
+function doDeleteAccount(){
+  Storage.remove("glowo_profile");
+  Storage.remove("glowo_settings");
+  location.reload();
+}
+
+/* ===================== ONBOARDING ===================== */
+document.getElementById("obStartBtn").addEventListener("click", ()=>{
+  document.getElementById("obStep2").classList.remove("active");
+  document.getElementById("obStep3").classList.add("active");
+});
+document.getElementById("obSubmitBtn").addEventListener("click", submitOnboarding);
+function submitOnboarding(){
+  const name = document.getElementById("obName").value.trim();
+  let username = document.getElementById("obUsername").value.trim().replace(/^@+/,"").replace(/\s+/g,"").toLowerCase();
+  const bdate = document.getElementById("obBirthdate").value;
+  const errEl = document.getElementById("obError");
+  errEl.classList.remove("show");
+  if(!name){ errEl.textContent = "Lütfen adını yaz."; errEl.classList.add("show"); return; }
+  if(!bdate){ errEl.textContent = "Lütfen doğum tarihini seç."; errEl.classList.add("show"); return; }
+  const age = calcAge(bdate);
+  if(age === null || age < 0 || age > 120){ errEl.textContent = "Geçerli bir doğum tarihi gir."; errEl.classList.add("show"); return; }
+  if(age < 13){ errEl.textContent = "Glowo'yu kullanmak için en az 13 yaşında olmalısın."; errEl.classList.add("show"); return; }
+  if(!username) username = name.toLowerCase().replace(/[^a-z0-9]+/g,"");
+  state.profile = {
+    name, user: "@"+username, bio:"Glowo'ya hoş geldim ✨", color: AV_COLORS[Math.floor(Math.random()*AV_COLORS.length)],
+    following:0, followers:0, likes:0, ptab:"videos", birthdate:bdate, isFounder: name.toLowerCase()==="yusuf"
+  };
+  persistAccount();
+  registerKnownAccount(state.profile);
+  document.getElementById("onboarding").classList.remove("show");
+  startApp();
+  toast(`Hoş geldin, ${name}! 🎉`);
+}
+document.getElementById("obBirthdate").addEventListener("keydown", e=>{ if(e.key==="Enter") submitOnboarding(); });
+
+/* ===================== ACCOUNT INIT ===================== */
+function applyTheme(){
+  document.body.classList.toggle("light", state.settings.theme === "light");
+}
+function startApp(){
+  applyTheme();
+  renderFeed();
+}
+function loadAccount(){
+  const savedSettings = Storage.get("glowo_settings");
+  if(savedSettings){ try{ Object.assign(state.settings, JSON.parse(savedSettings)); }catch(e){} }
+  applyTheme();
+  const savedProfile = Storage.get("glowo_profile");
+
+  // Her girişte kısa bir Glowo animasyonuyla açılır
+  document.getElementById("onboarding").classList.add("show");
+  document.querySelectorAll(".ob-step").forEach(s=>s.classList.remove("active"));
+  document.getElementById("obStep1").classList.add("active");
+
+  setTimeout(()=>{
+    document.getElementById("obStep1").classList.remove("active");
+    if(savedProfile){
+      try{ state.profile = JSON.parse(savedProfile); }catch(e){}
+      registerKnownAccount(state.profile);
+      document.getElementById("onboarding").classList.remove("show");
+      startApp();
+    } else {
+      document.getElementById("obStep2").classList.add("active");
+    }
+  }, 1600);
+}
+
+/* ===================== INIT ===================== */
+loadAccount();
 </script>
 </body>
 </html>
